@@ -62,10 +62,12 @@ public class ErrorRenderer implements EditorCustomElementRenderer {
         int currentX = p.x + metrics.stringWidth(indentation);
         int currentY = p.y;
 
-        g.drawString(this.msg + " Fix:", currentX, currentY + editor.getAscent());
+        g.drawString(this.msg , currentX, currentY + editor.getAscent()/2+3);
         g.setColor(Color.GREEN);
-        g.drawString("# " + this.msg, currentX, currentY +
-                editor.getAscent() + metrics.getHeight());
+        g.drawString("Fix: # " +
+                line.replaceFirst("^ +","")
+                        .replace("print2","print"),
+                currentX, currentY + editor.getAscent()/2 + metrics.getHeight());
 
     }
 }
