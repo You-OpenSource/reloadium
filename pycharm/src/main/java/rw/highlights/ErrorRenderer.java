@@ -35,10 +35,10 @@ public class ErrorRenderer implements EditorCustomElementRenderer {
 
         int lineNumber = document.getLineNumber(inlay.getOffset());
 
-        int offsetStart = editor.getDocument().getLineStartOffset(lineNumber);
-        int offsetEnd = editor.getDocument().getLineEndOffset(lineNumber);
+        int offsetStart = document.getLineStartOffset(lineNumber);
+        int offsetEnd = document.getLineEndOffset(lineNumber);
 
-        String line = editor.getDocument().getText(new TextRange(offsetStart, offsetEnd));
+        String line = document.getText(new TextRange(offsetStart, offsetEnd));
         String indentation = line.substring(0, line.length() - line.stripLeading().length());
 
         Color textColor = Color.RED;
@@ -62,6 +62,10 @@ public class ErrorRenderer implements EditorCustomElementRenderer {
         int currentX = p.x + metrics.stringWidth(indentation);
         int currentY = p.y;
 
-        g.drawString(this.msg, currentX, currentY + editor.getAscent());
+        g.drawString(this.msg + " Fix:", currentX, currentY + editor.getAscent());
+        g.setColor(Color.GREEN);
+        g.drawString("# " + this.msg, currentX, currentY +
+                editor.getAscent() + metrics.getHeight());
+
     }
 }
