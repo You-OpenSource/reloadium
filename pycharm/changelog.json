@@ -1,4 +1,122 @@
 {
+  "0.8.5": [
+    {
+      "type": "Added",
+      "description": "Support for no_reload decorator for frame reloads",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "cached_property issues",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Freeze on update",
+      "tag": "PyCharm",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Moving function closures",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Removed",
+      "description": "Win32 support",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "Profiling optimisations",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Moving non instantiated closures",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "Docker compose support",
+      "tag": "PyCharm",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "Docker support",
+      "tag": "PyCharm",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "PyTest extension",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "Disabling telemetry",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "Disabling error reporting",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "RELOADIUMIGNORE env variable",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "M1 support",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    },
+    {
+      "type": "Added",
+      "description": "Profiling optimisations",
+      "tag": "Miscellaneous",
+      "date": "2022-09-03"
+    }
+  ],
+  "0.8.4": [
+    {
+      "type": "Changed",
+      "description": "Add mypyc optimisations",
+      "tag": "Miscellaneous",
+      "date": "2022-08-06"
+    },
+    {
+      "type": "Added",
+      "description": "Support async methods",
+      "tag": "Miscellaneous",
+      "date": "2022-08-06"
+    },
+    {
+      "type": "Removed",
+      "description": "Python 3.6 support",
+      "tag": "Miscellaneous",
+      "date": "2022-08-06"
+    },
+    {
+      "type": "Added",
+      "description": "Nested closures support",
+      "tag": "Miscellaneous",
+      "date": "2022-08-06"
+    }
+  ],
   "0.8.3": [
     {
       "type": "Changed",
@@ -153,7 +271,7 @@
       "date": "2022-05-26"
     }
   ],
-    "0.8.1": [
+  "0.8.1": [
     {
       "type": "Fixed",
       "description": "Pydash icompatibility",
@@ -228,7 +346,7 @@
     }
   ],
   "0.8.0": [
-        {
+    {
       "type": "Fixed",
       "description": "Reloading decorated methods by objects",
       "tag": "Miscellaneous",
