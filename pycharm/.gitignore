@@ -3,5 +3,4 @@ build
 reloadium-*.zip
 video
 common
-src/main/resources/META-INF/wheels/*
 .DS_Store
