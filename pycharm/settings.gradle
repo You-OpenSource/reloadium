@@ -1,1 +1,1 @@
-rootProject.name = 'reloadium' //  # RwRender: rootProject.name = '{{ ctx.package_name }}' //
+rootProject.name = 'reloadium-you' //  # RwRender: rootProject.name = '{{ ctx.package_name }}' //

@@ -1,9 +1,9 @@
 <idea-plugin>
-    <id>org.reloadium</id>
-    <name>Reloadium - Hot Reloading &#38; Profiling for Python</name>
+    <id>com.you</id>
+    <name>You.com with Reloadium - Hot Reloading &#38; Profiling for Python</name>
     <version>0.8.5</version>
     <idea-version since-build="203"/>
-    <vendor email="damian@reloadware.com" url="reloadium.io">Reloadware</vendor>
+    <vendor email="keith@you.com" url="you.com">You.com</vendor>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
     <depends>com.intellij.modules.platform</depends>
@@ -16,7 +16,8 @@
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/profiling.gif" width="600px" alt="Profiling"/>
         </div>
         
-         <p>Reloadium adds hot reloading and profiling features to any Python application</p>
+         <p>You.com with Reloadium. We will autofix the debugging errors when using Reloadium.
+         Reloadium adds hot reloading and profiling features to any Python application</p>
         ]]>
     </description>
 
