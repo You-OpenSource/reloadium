@@ -21,9 +21,7 @@ import rw.pkg.WebPackageManager;
 import rw.service.Service;
 import rw.util.OsType;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class RunConfHandlerManager {
@@ -36,10 +34,13 @@ public class RunConfHandlerManager {
     public static RunConfHandlerManager singleton = null;
 
     Map<ExecutionEnvironment, BaseRunConfHandler> all;
+    @Nullable
+    BaseRunConfHandler last;
 
     @VisibleForTesting
     public RunConfHandlerManager() {
         this.all = new HashMap<>();
+        this.last = null;
     }
 
     public static RunConfHandlerManager get() {
@@ -52,6 +53,7 @@ public class RunConfHandlerManager {
 
     public void register(ExecutionEnvironment executionEnvironment, BaseRunConfHandler baseRunConfHandler) {
         this.all.put(executionEnvironment, baseRunConfHandler);
+        this.last = baseRunConfHandler;
     }
 
     @Nullable
@@ -59,6 +61,29 @@ public class RunConfHandlerManager {
         return this.all.get(executionId);
     }
 
+    public List<BaseRunConfHandler> getForProject(Project project) {
+        List<BaseRunConfHandler> ret = new ArrayList<>();
+
+        this.all.forEach((key, value) -> {
+            if(value.getProject() == project) {
+                ret.add(value);
+            }
+        });
+        return ret;
+    }
+
+    public List<BaseRunConfHandler> getAllActiveHandlers(@Nullable Project project) {
+        List<BaseRunConfHandler> ret = new ArrayList<>();
+
+        this.all.forEach((key, value) -> {
+            if((project == null || value.getProject() == project) && value.isActive()) {
+                ret.add(value);
+            }
+        });
+        return ret;
+    }
+
+    @Nullable
     public BaseRunConfHandler getCurrentHandler(Project project) {
         XDebugSessionImpl debugSession = ((XDebugSessionImpl) XDebuggerManager.getInstance(project).getCurrentSession());
 
@@ -74,6 +99,11 @@ public class RunConfHandlerManager {
 
         BaseRunConfHandler handler = this.all.get(environment);
         return handler;
+    }
+
+    @Nullable
+    public BaseRunConfHandler getLastHandler() {
+        return this.last;
     }
 
     public void deactivateAll() {
