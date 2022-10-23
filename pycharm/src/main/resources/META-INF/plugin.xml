@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.you</id>
     <name>You.com with Reloadium - Hot Reloading &#38; Profiling for Python</name>
-    <version>0.8.5</version>
+    <version>0.8.6</version>
     <idea-version since-build="203"/>
     <vendor email="keith@you.com" url="you.com">You.com</vendor>
     <depends>com.intellij.modules.lang</depends>

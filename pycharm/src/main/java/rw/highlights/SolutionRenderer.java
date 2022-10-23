@@ -1,26 +1,26 @@
 package rw.highlights;
 
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorCustomElementRenderer;
-import com.intellij.openapi.editor.Inlay;
+import com.intellij.diff.util.DiffGutterRenderer;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rw.icons.Icons;
 
 import java.awt.*;
 
-public class ErrorRenderer implements EditorCustomElementRenderer {
-    String msg;
-    String fixMessage;
+public class SolutionRenderer implements EditorCustomElementRenderer {
+    String solutionSuggestion;
+    private final int offset;
 
-    ErrorRenderer(String msg, String fixMessage) {
-        this.msg = msg;
-        this.fixMessage = fixMessage;
+    SolutionRenderer(String fixMessage, int offset) {
+        this.solutionSuggestion = fixMessage;
+        this.offset = offset;
     }
 
     @Override
@@ -35,8 +35,18 @@ public class ErrorRenderer implements EditorCustomElementRenderer {
 
     @Override
     public @Nullable GutterIconRenderer calcGutterIconRenderer(@NotNull Inlay inlay) {
-
-        return EditorCustomElementRenderer.super.calcGutterIconRenderer(inlay);
+        return new DiffGutterRenderer(Icons.ProductIcon, "FIX") {
+            @Override
+            protected void handleMouseClick() {
+                Editor editor = inlay.getEditor();
+                Document document = editor.getDocument();
+                int line = inlay.getVisualPosition().line;
+                int start = document.getLineStartOffset(line);
+                int end = document.getLineEndOffset(line);
+                document.deleteString(start, end);
+                document.insertString(start, solutionSuggestion);
+            }
+        };
     }
 
     @Override
@@ -52,7 +62,7 @@ public class ErrorRenderer implements EditorCustomElementRenderer {
         String line = document.getText(new TextRange(offsetStart, offsetEnd));
         String indentation = line.substring(0, line.length() - line.stripLeading().length());
 
-        Color textColor = Color.RED;
+        Color textColor = JBColor.GREEN;
         g.setColor(textColor);
 
         EditorColorsScheme colorsScheme = editor.getColorsScheme();
@@ -73,12 +83,8 @@ public class ErrorRenderer implements EditorCustomElementRenderer {
         int currentX = p.x + metrics.stringWidth(indentation);
         int currentY = p.y;
 
-        g.drawString(this.msg , currentX, currentY + editor.getAscent()+3);
-        g.setColor(Color.GREEN);
-//        if (fixMessage != null) {
-//            g.drawString("Fix: # " + fixMessage,
-//                    currentX, currentY + editor.getAscent() / 2 + metrics.getHeight());
-//        }
+        g.drawString(this.solutionSuggestion, currentX, currentY + editor.getAscent() + 3);
+
 
     }
 }

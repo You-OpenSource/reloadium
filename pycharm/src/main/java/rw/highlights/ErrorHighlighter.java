@@ -1,16 +1,21 @@
 package rw.highlights;
 
+import com.intellij.codeInsight.daemon.impl.HintRenderer;
+import com.intellij.diff.util.DiffGutterRenderer;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
+import rw.icons.Icons;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,13 +30,15 @@ public class ErrorHighlighter {
     int line;
     String msg;
     Project project;
-    List<Inlay<ErrorRenderer>> inlays;
+    List<Inlay<? extends EditorCustomElementRenderer>> inlays;
+    String fixSuggestion;
 
-    ErrorHighlighter(Project project, File file, int line, String msg) {
+    ErrorHighlighter(Project project, File file, int line, String msg, String fixSuggestion) {
         this.file = file;
         this.msg = msg;
         this.project = project;
         this.line = line;
+        this.fixSuggestion = fixSuggestion;
 
         this.inlays = new ArrayList<>();
 
@@ -48,11 +55,14 @@ public class ErrorHighlighter {
         for (Editor e : EditorFactory.getInstance().getEditors(document)) {
             InlayModel inlayModel = e.getInlayModel();
 
-            ErrorRenderer renderer = new ErrorRenderer(this.msg);
+            ErrorRenderer renderer = new ErrorRenderer(this.msg, this.fixSuggestion);
+            SolutionRenderer solutionRenderer = new SolutionRenderer(this.fixSuggestion, this.line);
             ApplicationManager.getApplication().invokeLater(() -> {
                 int offset = e.logicalPositionToOffset(new LogicalPosition(this.line-1, 0));
-                Inlay<ErrorRenderer> inlay = inlayModel.addBlockElement(offset, true, false, 100, renderer);
+                Inlay<EditorCustomElementRenderer> inlay = inlayModel.addBlockElement(offset, true, false, 100, renderer);
+                Inlay<EditorCustomElementRenderer> solution = inlayModel.addBlockElement(offset + 1, true, false, 100, solutionRenderer);
                 this.inlays.add(inlay);
+                this.inlays.add(solution);
             });
         }
     }
@@ -61,7 +71,7 @@ public class ErrorHighlighter {
         this.highlighter.hide();
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            for (Inlay<ErrorRenderer> i : this.inlays) {
+            for (Inlay<? extends EditorCustomElementRenderer> i : this.inlays) {
                 i.dispose();
             }
         });

@@ -39,7 +39,7 @@ public class ErrorHighlightManager {
         this.project = project;
     }
 
-    public void add(File file, int line, String msg) {
+    public void add(File file, int line, String msg, String fixSuggestion) {
         if (!this.all.containsKey(file)) {
             this.all.put(file, new ArrayList<>());
         }
@@ -48,7 +48,7 @@ public class ErrorHighlightManager {
             return;
         }
 
-        ErrorHighlighter highlighter = new ErrorHighlighter(this.project, file, line, msg);
+        ErrorHighlighter highlighter = new ErrorHighlighter(this.project, file, line, msg, fixSuggestion);
         this.all.get(file).add(highlighter);
 
         highlighter.show();

@@ -2,7 +2,7 @@ import java.util.stream.Collectors
 
 plugins {
     id('java')
-    id('org.jetbrains.intellij') version '1.9.0'
+    id('org.jetbrains.intellij') version '1.10.0-SNAPSHOT'
     id("org.jetbrains.kotlin.jvm") version "1.7.20-RC"
     id('com.adarshr.test-logger') version '3.1.0'
     // Gradle Changelog Plugin
@@ -74,6 +74,11 @@ dependencies {
             'net.lingala.zip4j:zip4j:2.11.1',
             'commons-io:commons-io:2.11.0',
     )
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
+    implementation("com.segment.analytics.java:analytics:2.1.1")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
 
     testImplementation(
             'com.intellij.remoterobot:remote-robot:' + remoteRobotVersion,
@@ -100,6 +105,9 @@ sourceSets {
         java {
             srcDir 'src/main/java'
         }
+        kotlin {
+            srcDir 'src/main/java'
+        }
         resources {
             srcDir 'src/main/resources'
         }
@@ -118,18 +126,22 @@ sourceSets {
 }
 
 intellij {
-    if (intellijPro.toBoolean()) {
-        version = 'PY-2021.3.2'
-        type = 'PY'
-        plugins = ["python"]
-    } else {
-        version = intellijVersion
-        type = intellijType
-        plugins = [intellijPlugin]
-    }
+    version = intellijVersion
+    type = intellijType
     downloadSources = intellijDownloadSources as Boolean
+    plugins = [intellijPlugin]
     updateSinceUntilBuild = false
 }
+
+// Pro
+//intellij {
+//    version = 'PY-2021.3.2'
+//    type = 'PY'
+//    downloadSources = true
+//    plugins = ["python"]
+//    updateSinceUntilBuild = false
+//}
+
 
 test {
     useJUnitPlatform()
