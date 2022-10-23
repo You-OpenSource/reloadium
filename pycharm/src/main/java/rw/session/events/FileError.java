@@ -17,13 +17,15 @@ abstract public class FileError extends FileEvent {
 
     @Override
     public void handle() {
+        this.handler.getErrorHighlightManager().clearAll();
+        this.handler.getErrorHighlightManager().add(this.getLocalPath(), this.line, this.msg, null);
         VirtualFile file = new VirtualFileWrapper(this.getLocalPath()).getVirtualFile(false);
         Document document = ReadAction.compute(() -> FileDocumentManager.getInstance().getDocument(file));
         int lineNumber = getLine() - 1;
         String errorLine = document.getText(TextRange.create(document.getLineStartOffset(lineNumber), document.getLineEndOffset(lineNumber)));
         String res = CodeCompletionService.INSTANCE.predictFix(errorLine).blockingFirst();
-        this.handler.getErrorHighlightManager().clearAll();
-        this.handler.getErrorHighlightManager().add(this.getLocalPath(), this.line, this.msg, res);
+        this.handler.getSolutionHighlightManager().clearAll();
+        this.handler.getSolutionHighlightManager().add(this.getLocalPath(), this.line, this.msg, res);
     }
 
     public Integer getLine() {

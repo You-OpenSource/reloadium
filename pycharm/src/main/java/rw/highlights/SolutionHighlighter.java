@@ -1,21 +1,12 @@
 package rw.highlights;
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer;
-import com.intellij.diff.util.DiffGutterRenderer;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
-import rw.icons.Icons;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +15,7 @@ import java.util.List;
 import static com.intellij.codeInsight.hint.HintUtil.ERROR_COLOR_KEY;
 import static com.intellij.openapi.editor.colors.EditorColorsUtil.getGlobalOrDefaultColor;
 
-public class ErrorHighlighter {
+public class SolutionHighlighter {
     Highlighter highlighter;
     File file;
     int line;
@@ -33,7 +24,7 @@ public class ErrorHighlighter {
     List<Inlay<? extends EditorCustomElementRenderer>> inlays;
     String fixSuggestion;
 
-    ErrorHighlighter(Project project, File file, int line, String msg, String fixSuggestion) {
+    SolutionHighlighter(Project project, File file, int line, String msg, String fixSuggestion) {
         this.file = file;
         this.msg = msg;
         this.project = project;
@@ -55,12 +46,11 @@ public class ErrorHighlighter {
         for (Editor e : EditorFactory.getInstance().getEditors(document)) {
             InlayModel inlayModel = e.getInlayModel();
 
-            ErrorRenderer renderer = new ErrorRenderer(this.msg, this.fixSuggestion);
             SolutionRenderer solutionRenderer = new SolutionRenderer(this.fixSuggestion, this.line);
             ApplicationManager.getApplication().invokeLater(() -> {
                 int offset = e.logicalPositionToOffset(new LogicalPosition(this.line-1, 0));
-                Inlay<EditorCustomElementRenderer> inlay = inlayModel.addBlockElement(offset, true, false, 100, renderer);
-                this.inlays.add(inlay);
+                Inlay<EditorCustomElementRenderer> solution = inlayModel.addBlockElement(offset + 1, true, false, 100, solutionRenderer);
+                this.inlays.add(solution);
             });
         }
     }

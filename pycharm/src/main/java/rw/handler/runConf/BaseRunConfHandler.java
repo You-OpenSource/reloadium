@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import rw.action.RunType;
+import rw.highlights.SolutionHighlightManager;
 import rw.icons.IconPatcher;
 import rw.profile.FrameProgressRenderer;
 import rw.profile.LineProfiler;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class BaseRunConfHandler implements Disposable {
+    private final SolutionHighlightManager solutionHighlightManager;
     AbstractPythonRunConfiguration<?> runConf;
     @Nullable
     SdkHandler sdkHandler;
@@ -58,6 +60,7 @@ public abstract class BaseRunConfHandler implements Disposable {
         this.lineProfiler = new LineProfiler();
         this.session = new Session(this.project, this);
         this.errorHighlightManager = new ErrorHighlightManager(this.project);
+        this.solutionHighlightManager = new SolutionHighlightManager(this.project);
         this.profilePreviewRenderer = new ProfilePreviewRenderer(this.project, this.stack, this.lineProfiler);
 
         this.watchedFiles = new HashSet<>();
@@ -111,6 +114,9 @@ public abstract class BaseRunConfHandler implements Disposable {
     public ErrorHighlightManager getErrorHighlightManager() {
         return errorHighlightManager;
     }
+    public SolutionHighlightManager getSolutionHighlightManager() {
+        return solutionHighlightManager;
+    }
 
     public Project getProject() {
         return project;
@@ -150,6 +156,7 @@ public abstract class BaseRunConfHandler implements Disposable {
 
     public void activate() {
         this.errorHighlightManager.activate();
+        this.solutionHighlightManager.activate();
         this.profilePreviewRenderer.activate();
         this.frameProgressRenderer.activate();
         this.active = true;
@@ -158,6 +165,7 @@ public abstract class BaseRunConfHandler implements Disposable {
 
     public void deactivate() {
         this.errorHighlightManager.deactivate();
+        this.solutionHighlightManager.deactivate();
         this.profilePreviewRenderer.deactivate();
         this.frameProgressRenderer.deactivate();
         this.active = false;
