@@ -2,6 +2,7 @@ package com.github.youopensource.youjetbrainsearch.screen
 
 import com.github.youopensource.youjetbrainsearch.data.Solution
 import com.github.youopensource.youjetbrainsearch.services.ApiService
+import com.github.youopensource.youjetbrainsearch.services.YouPreferences
 import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.application.ApplicationManager
@@ -11,7 +12,6 @@ import com.intellij.openapi.editor.EditorSettings
 import com.intellij.openapi.editor.actions.IncrementalFindAction
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
-import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -22,6 +22,7 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.EditorCustomization
 import com.intellij.ui.EditorTextField
 import com.intellij.ui.EditorTextFieldProvider
+import com.intellij.ui.components.CheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanelWithEmptyText
 import com.intellij.ui.components.JBScrollPane
@@ -33,6 +34,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import java.awt.Desktop
 import java.net.URI
 import javax.swing.JButton
+import javax.swing.JCheckBox
 
 class SideSuggestionViewFactory : ToolWindowFactory {
     private val LOG: Logger = Logger.getInstance(this.javaClass)
@@ -84,6 +86,7 @@ class SideSuggestionViewFactory : ToolWindowFactory {
             LOG.debug("No solutions were found, skipping UI")
             return
         }
+        dataProviderPanel?.add(createSettingsView())
         solutionList.map { solution ->
             val elements = createCodeSuggestionView(project!!, solution)
             dataProviderPanel?.add(
@@ -106,6 +109,15 @@ class SideSuggestionViewFactory : ToolWindowFactory {
         )
     }
 
+
+    private fun createSettingsView(): JCheckBox {
+        val onlySelectionSearch = YouPreferences.getInstance().state.onlySelectionSearch
+        return CheckBox("Only search on selection", onlySelectionSearch, "If enabled").apply {
+            addActionListener {
+                YouPreferences.getInstance().state.onlySelectionSearch = this.isSelected
+            }
+        }
+    }
 
     private fun createCodeSuggestionView(project: Project, solution: Solution): SuggestionPanel {
         val smallButton = SmallButton("Try Solution ${solution.number}").apply {

@@ -1,6 +1,8 @@
 package com.github.youopensource.youjetbrainsearch.services
 
 import com.github.youopensource.youjetbrainsearch.data.SolutionRequest
+import com.intellij.openapi.components.PersistentStateComponent
+import com.intellij.openapi.components.State
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
@@ -31,12 +33,17 @@ class MyProjectService(project: Project) {
                     return
                 }
                 val caret = event.caret!!
-                var searchText: String = if (caret.selectedText != null) {
-                    caret.selectedText!!
+                var searchText: String
+                if (caret.selectedText != null) {
+                    searchText = caret.selectedText!!
                 } else {
+                    val onlySelectionSearch = YouPreferences.getInstance().state.onlySelectionSearch
+                    if(onlySelectionSearch) {
+                        return
+                    }
                     val start = caret.visualLineStart
                     val end = caret.visualLineEnd
-                    editor.document.getText(TextRange.create(start, end))
+                    searchText = editor.document.getText(TextRange.create(start, end))
                 }
                 searchText = wrapCommand(searchText, project, editor)
                 ApiService.getRequestPublisher().onNext(
