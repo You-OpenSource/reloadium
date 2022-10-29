@@ -1,13 +1,20 @@
 package rw.highlights;
 
 import com.intellij.diff.util.DiffGutterRenderer;
-import com.intellij.openapi.editor.*;
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorCustomElementRenderer;
+import com.intellij.openapi.editor.Inlay;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
+import icons.JupyterCoreIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rw.icons.Icons;
@@ -35,16 +42,20 @@ public class SolutionRenderer implements EditorCustomElementRenderer {
 
     @Override
     public @Nullable GutterIconRenderer calcGutterIconRenderer(@NotNull Inlay inlay) {
-        return new DiffGutterRenderer(Icons.ProductIcon, "FIX") {
+        return new DiffGutterRenderer(AllIcons.Diff.MagicResolve, "Use suggestion") {
             @Override
             protected void handleMouseClick() {
-                Editor editor = inlay.getEditor();
-                Document document = editor.getDocument();
-                int line = inlay.getVisualPosition().line;
-                int start = document.getLineStartOffset(line);
-                int end = document.getLineEndOffset(line);
-                document.deleteString(start, end);
-                document.insertString(start, solutionSuggestion);
+                Application application = ApplicationManager.getApplication();
+                application.runWriteAction(() -> {
+                    Editor editor = inlay.getEditor();
+                    Document document = editor.getDocument();
+                    int line = inlay.getVisualPosition().line;
+                    int start = document.getLineStartOffset(line);
+                    int end = document.getLineEndOffset(line);
+                    document.deleteString(start, end + 1);
+                    document.insertString(start, solutionSuggestion);
+                });
+
             }
         };
     }
@@ -83,7 +94,7 @@ public class SolutionRenderer implements EditorCustomElementRenderer {
         int currentX = p.x + metrics.stringWidth(indentation);
         int currentY = p.y;
 
-        g.drawString(this.solutionSuggestion, currentX, currentY + editor.getAscent() + 3);
+        g.drawString("Possible fix: " +this.solutionSuggestion.strip(), currentX, currentY + editor.getAscent() + 3);
 
 
     }
