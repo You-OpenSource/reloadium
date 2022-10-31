@@ -18,13 +18,14 @@
         
          <p>You.com with Reloadium. <p>
          This plugin is a fork of Reloadium with You.com Copilot to automatically
-          fix the errors.<br>
+          fix the Python runtime errors that Reloadium found.<br>
          Reloadium adds hot reloading and profiling features to any Python application</p>
-         You.com plugin runs the Salesforce 16GB Codex to automatically
+         You.com plugin runs the Salesforce <a href="https://github.com/salesforce/CodeGen">16GB Codegen</a>
+          model to automatically
           fix any errors in debugging. To test out functionality:<br>
           1. create a helloworld project in python but write print2("hello")<br>
           2. put a breakpoint in that line and debug project using the orange Reloadium debug button<br>
-          3. Press step over, Reloadium will display the error and you.com will display the fix.
+          3. Press step over, Reloadium will display the error and you.com will display the fix and implement it.
         ]]>
     </description>
 
