@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 import rw.action.RunType;
+import rw.icons.IconPatcher;
 import rw.profile.FrameProgressRenderer;
 import rw.profile.LineProfiler;
 import rw.stack.Stack;
@@ -23,6 +24,11 @@ import rw.highlights.ErrorHighlightManager;
 import rw.profile.ProfilePreviewRenderer;
 import rw.service.Service;
 import rw.session.Session;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class BaseRunConfHandler implements Disposable {
     AbstractPythonRunConfiguration<?> runConf;
@@ -37,6 +43,10 @@ public abstract class BaseRunConfHandler implements Disposable {
     ProfilePreviewRenderer profilePreviewRenderer;
     Project project;
     MessageBusConnection messageBusConnection;
+    Set<File> watchedFiles;
+    boolean active;
+    @Nullable
+    RunType runType;
 
     public BaseRunConfHandler(RunConfiguration runConf) {
         this.runConf = (AbstractPythonRunConfiguration<?>) runConf;
@@ -50,6 +60,9 @@ public abstract class BaseRunConfHandler implements Disposable {
         this.errorHighlightManager = new ErrorHighlightManager(this.project);
         this.profilePreviewRenderer = new ProfilePreviewRenderer(this.project, this.stack, this.lineProfiler);
 
+        this.watchedFiles = new HashSet<>();
+        this.active = true;
+
         this.handleJbEvents();
     }
 
@@ -60,6 +73,10 @@ public abstract class BaseRunConfHandler implements Disposable {
     abstract public void afterRun();
 
     abstract public boolean isReloadiumActivated();
+
+    public RunType getRunType() {
+        return this.runType;
+    }
 
     public @NotNull
     String convertPathToLocal(@NotNull String remotePath) {
@@ -99,6 +116,10 @@ public abstract class BaseRunConfHandler implements Disposable {
         return project;
     }
 
+    public boolean isActive() {
+        return this.active;
+    }
+
     private void handleJbEvents() {
         this.messageBusConnection = this.project.getMessageBus().connect(Service.get());
 
@@ -107,7 +128,16 @@ public abstract class BaseRunConfHandler implements Disposable {
         this.messageBusConnection.subscribe(RunContentManager.TOPIC, new RunContentWithExecutorListener() {
             @Override
             public void contentSelected(@Nullable RunContentDescriptor descriptor, @NotNull Executor executor) {
+                if (This.getRunType() != RunType.DEBUG) {
+                    return;
+                }
+
                 BaseRunConfHandler handler = RunConfHandlerManager.get().getCurrentHandler(project);
+
+                if (handler == null) {
+                    return;
+                }
+
                 if (handler == This) {
                     This.activate();
                 }
@@ -122,12 +152,25 @@ public abstract class BaseRunConfHandler implements Disposable {
         this.errorHighlightManager.activate();
         this.profilePreviewRenderer.activate();
         this.frameProgressRenderer.activate();
+        this.active = true;
+        IconPatcher.refresh(this.getProject());
     }
 
     public void deactivate() {
         this.errorHighlightManager.deactivate();
         this.profilePreviewRenderer.deactivate();
         this.frameProgressRenderer.deactivate();
+        this.active = false;
+        IconPatcher.refresh(this.getProject());
+    }
+
+    public void addWatched(Set<File> files) {
+        this.watchedFiles.addAll(files);
+    }
+
+    public boolean isWatched(File file) {
+        boolean ret = this.watchedFiles.contains(file);
+        return ret;
     }
 
     @Override
@@ -138,7 +181,6 @@ public abstract class BaseRunConfHandler implements Disposable {
     public ProfilePreviewRenderer getProfilePreviewRenderer() {
         return profilePreviewRenderer;
     }
-
 
     // Test methods ################
     @VisibleForTesting

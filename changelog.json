@@ -1,4 +1,110 @@
 {
+  "0.9.4": [
+    {
+      "type": "Fixed",
+      "description": "Fix adding from import items issue",
+      "tag": "Miscellaneous",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "Fix windows multiprocessing bugs",
+      "tag": "Miscellaneous",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Added",
+      "description": "Easier downgrading",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Removed",
+      "description": "Package autoupdater",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "Confusing RELOADIUMPATH message when no files are watched",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "Remote interpreter issues for new PyCharm versions",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "View pane null pointer exception",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    }
+  ],
+  "0.9.3": [
+    {
+      "type": "Fixed",
+      "description": "Encoding issues",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Import threading issues",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Multiprocessing extension",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Manual reload file command",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Symlinks and mounted directories support",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Reloadable files highlighting",
+      "tag": "PyCharm",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Manual reload action",
+      "tag": "PyCharm",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Multiprocessing issues",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Double popup issue on FrameError",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Too many open files issue",
+      "tag": "PyCharm",
+      "date": "2022-10-03"
+    }
+  ],
   "0.9.2": [
     {
       "type": "Added",

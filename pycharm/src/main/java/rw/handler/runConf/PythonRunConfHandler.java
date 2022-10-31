@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import rw.action.RunType;
 import rw.audit.RwSentry;
 import rw.consts.Const;
+import rw.icons.IconPatcher;
 import rw.preferences.Preferences;
 import rw.preferences.PreferencesState;
 import rw.settings.ProjectState;
@@ -52,8 +53,9 @@ public class PythonRunConfHandler extends BaseRunConfHandler {
     @Override
     public void beforeRun(RunType runType) {
         PreferencesState preferences = Preferences.getInstance().getState();
-
         String command;
+
+        this.runType = runType;
 
         if (runType == RunType.DEBUG) {
             command = "pydev_proxy";
@@ -101,7 +103,12 @@ public class PythonRunConfHandler extends BaseRunConfHandler {
             }
         }
 
+        if (reloadiumPath.isEmpty() && this.runConf.getWorkingDirectory().isEmpty()) {
+            reloadiumPath.add(this.project.getBasePath());
+        }
+
         List<String> reloadiumPathRemote = this.getRemotePaths(reloadiumPath);
+
         this.runConf.getEnvs().put(this.RELOADIUMPATH_ENV, String.join(pathSep, reloadiumPathRemote));
 
         List<String> reloadiumIgnore = new ArrayList<>(state.reloadiumIgnore);
@@ -119,7 +126,7 @@ public class PythonRunConfHandler extends BaseRunConfHandler {
         } else {
             pythonpath = packagePath;
         }
-        this.runConf.getEnvs().put("PYTHONPATH", pythonpath);
+        this.runConf.getEnvs().put("PYTHONPATH", pythonpath);  //  # RwRender: this.runConf.getEnvs().put("PYTHONPATH", {{ ctx.pythonpath }});  //
     }
 
     private List<String> getRemotePaths(List<String> paths) {
@@ -143,6 +150,7 @@ public class PythonRunConfHandler extends BaseRunConfHandler {
     public void onProcessExit() {
         super.onProcessExit();
         this.session.close();
+        IconPatcher.refresh(this.project);
     }
 
     @Override

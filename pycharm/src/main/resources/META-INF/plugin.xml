@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.reloadium</id>
     <name>Reloadium - Hot Reloading &#38; Profiling for Python</name>
-    <version>0.8.5</version>
+    <version>0.8.8</version>
     <idea-version since-build="203"/>
     <vendor email="damian@reloadware.com" url="reloadium.io">Reloadware</vendor>
     <depends>com.intellij.modules.lang</depends>
@@ -22,6 +22,95 @@
 
     <change-notes><![CDATA[
     
+        <h3>0.8.8</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Empty working directory issues</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.8.7</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Fix adding from import items issue</li>
+                            <li>Fix windows multiprocessing bugs</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Easier downgrading</li>
+                        </ul>
+                    
+                        <b>Removed:</b>
+                        <ul>
+                            <li>Package autoupdater</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Confusing RELOADIUMPATH message when no files are watched</li>
+                            <li>Remote interpreter issues for new PyCharm versions</li>
+                            <li>View pane null pointer exception</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.8.6</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Encoding issues</li>
+                            <li>Import threading issues</li>
+                            <li>Multiprocessing issues</li>
+                            <li>Double popup issue on FrameError</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Multiprocessing extension</li>
+                            <li>Manual reload file command</li>
+                            <li>Symlinks and mounted directories support</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Reloadable files highlighting</li>
+                            <li>Manual reload action</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Too many open files issue</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
         <h3>0.8.5</h3>
             <div style="padding-left: 20px;">
             
@@ -608,6 +697,10 @@
           serviceImplementation="rw.service.Service"
           testServiceImplementation="rw.service.TestService"
           />
+
+        <fileDocumentManagerListener implementation="rw.action.ReloadOnSave"/>
+        <fileIconPatcher implementation="rw.icons.IconPatcher" order="last"/>
+        <projectViewNodeDecorator implementation="rw.icons.IconDecorator"/>
     </extensions>
 
     <actions>
@@ -648,16 +741,20 @@
             <add-to-group group-id="RunContextGroup" anchor="first"/>
         </action>
 
+        <action id="ManualReload"
+                class="rw.action.ManualReload"
+                text="Reload File"
+                description="Reload File"
+                icon="rw.icons.Icons.Update">
+            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunContextGroup" anchor="last"/>
+        </action>
+
         <action id="RerunDebugWithReloadium" class="rw.action.RerunDebugWithReloadium">
             <add-to-group group-id="XDebugger.ToolWindow.LeftToolbar" anchor="first"/>
         </action>
 
         <group id="ReloadiumGroup" text="Reloadium" popup="true">
-            <action id="UpdatePackage"
-                    class="rw.action.Update"
-                    text="Update Reloadium Package"
-                    icon="rw.icons.Icons.Update">
-            </action>
             <action id="ReloadiumProjectSettings"
                     class="rw.action.ProjectSettings"
                     text="Project Settings"
