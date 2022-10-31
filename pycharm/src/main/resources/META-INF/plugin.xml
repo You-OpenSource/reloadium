@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.you</id>
     <name>You.com with Reloadium - Hot Reloading &#38; Profiling for Python</name>
-    <version>0.8.6</version>
+    <version>0.8.8</version>
     <idea-version since-build="203"/>
     <vendor email="keith@you.com" url="you.com">You.com</vendor>
     <depends>com.intellij.modules.lang</depends>
@@ -16,13 +16,71 @@
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/profiling.gif" width="600px" alt="Profiling"/>
         </div>
         
-         <p>You.com with Reloadium. We will autofix the debugging errors when using Reloadium.
+         <p>You.com with Reloadium. <p>
+         This plugin is a fork of Reloadium with You.com Copilot to automatically
+          fix the Python runtime errors that Reloadium found.<br>
          Reloadium adds hot reloading and profiling features to any Python application</p>
+         You.com plugin runs the Salesforce <a href="https://github.com/salesforce/CodeGen">16GB Codegen</a>
+          model to automatically
+          fix any errors in debugging. To test out functionality:<br>
+          1. create a helloworld project in python but write print2("hello")<br>
+          2. put a breakpoint in that line and debug project using the orange Reloadium debug button<br>
+          3. Press step over, Reloadium will display the error and you.com will display the fix and implement it.
         ]]>
     </description>
 
     <change-notes><![CDATA[
     
+        <h3>0.8.8</h3>
+            <div style="padding-left: 20px;">
+
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Empty working directory issues</li>
+                        </ul>
+
+                </div>
+            </div>
+        </div>
+        <h3>0.8.7</h3>
+            <div style="padding-left: 20px;">
+
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Fix adding from import items issue</li>
+                            <li>Fix windows multiprocessing bugs</li>
+                        </ul>
+
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+
+                        <b>Added:</b>
+                        <ul>
+                            <li>Easier downgrading</li>
+                        </ul>
+
+                        <b>Removed:</b>
+                        <ul>
+                            <li>Package autoupdater</li>
+                        </ul>
+
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Confusing RELOADIUMPATH message when no files are watched</li>
+                            <li>Remote interpreter issues for new PyCharm versions</li>
+                            <li>View pane null pointer exception</li>
+                        </ul>
+
+                </div>
+            </div>
+        </div>
         <h3>0.8.6</h3>
             <div style="padding-left: 20px;">
 
@@ -728,11 +786,6 @@
         </action>
 
         <group id="ReloadiumGroup" text="Reloadium" popup="true">
-            <action id="UpdatePackage"
-                    class="rw.action.Update"
-                    text="Update Reloadium Package"
-                    icon="rw.icons.Icons.Update">
-            </action>
             <action id="ReloadiumProjectSettings"
                     class="rw.action.ProjectSettings"
                     text="Project Settings"
