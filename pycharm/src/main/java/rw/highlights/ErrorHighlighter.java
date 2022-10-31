@@ -31,14 +31,12 @@ public class ErrorHighlighter {
     String msg;
     Project project;
     List<Inlay<? extends EditorCustomElementRenderer>> inlays;
-    String fixSuggestion;
 
-    ErrorHighlighter(Project project, File file, int line, String msg, String fixSuggestion) {
+    ErrorHighlighter(Project project, File file, int line, String msg) {
         this.file = file;
         this.msg = msg;
         this.project = project;
         this.line = line;
-        this.fixSuggestion = fixSuggestion;
 
         this.inlays = new ArrayList<>();
 
@@ -55,8 +53,7 @@ public class ErrorHighlighter {
         for (Editor e : EditorFactory.getInstance().getEditors(document)) {
             InlayModel inlayModel = e.getInlayModel();
 
-            ErrorRenderer renderer = new ErrorRenderer(this.msg, this.fixSuggestion);
-            SolutionRenderer solutionRenderer = new SolutionRenderer(this.fixSuggestion, this.line);
+            ErrorRenderer renderer = new ErrorRenderer(this.msg);
             ApplicationManager.getApplication().invokeLater(() -> {
                 int offset = e.logicalPositionToOffset(new LogicalPosition(this.line-1, 0));
                 Inlay<EditorCustomElementRenderer> inlay = inlayModel.addBlockElement(offset, true, false, 100, renderer);

@@ -18,7 +18,7 @@ abstract public class FileError extends FileEvent {
     @Override
     public void handle() {
         this.handler.getErrorHighlightManager().clearAll();
-        this.handler.getErrorHighlightManager().add(this.getLocalPath(), this.line, this.msg, null);
+        this.handler.getErrorHighlightManager().add(this.getLocalPath(), this.line, this.msg);
         VirtualFile file = new VirtualFileWrapper(this.getLocalPath()).getVirtualFile(false);
         Document document = ReadAction.compute(() -> FileDocumentManager.getInstance().getDocument(file));
         int lineNumber = getLine() - 1;

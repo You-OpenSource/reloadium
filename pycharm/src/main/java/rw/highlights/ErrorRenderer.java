@@ -16,11 +16,8 @@ import java.awt.*;
 
 public class ErrorRenderer implements EditorCustomElementRenderer {
     String msg;
-    String fixMessage;
-
-    ErrorRenderer(String msg, String fixMessage) {
+    ErrorRenderer(String msg) {
         this.msg = msg;
-        this.fixMessage = fixMessage;
     }
 
     @Override
@@ -75,10 +72,5 @@ public class ErrorRenderer implements EditorCustomElementRenderer {
 
         g.drawString(this.msg , currentX, currentY + editor.getAscent()+3);
         g.setColor(Color.GREEN);
-//        if (fixMessage != null) {
-//            g.drawString("Fix: # " + fixMessage,
-//                    currentX, currentY + editor.getAscent() / 2 + metrics.getHeight());
-//        }
-
     }
 }
