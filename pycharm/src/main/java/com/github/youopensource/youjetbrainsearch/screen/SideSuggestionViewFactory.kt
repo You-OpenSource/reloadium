@@ -59,6 +59,9 @@ class SideSuggestionViewFactory : ToolWindowFactory {
             border = JBUI.Borders.empty(5, 10, 10, 15)
         }
         dataProviderPanel!!.add(
+            createSettingsView()
+        )
+        dataProviderPanel!!.add(
             JBLabel("Loading...")
         )
 
