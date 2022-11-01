@@ -32,6 +32,8 @@ import com.intellij.util.ui.Centerizer
 import com.intellij.util.ui.JBUI
 import io.reactivex.rxjava3.disposables.Disposable
 import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.net.URI
 import javax.swing.JButton
 import javax.swing.JCheckBox
@@ -123,8 +125,10 @@ class SideSuggestionViewFactory : ToolWindowFactory {
     }
 
     private fun createCodeSuggestionView(project: Project, solution: Solution): SuggestionPanel {
-        val smallButton = SmallButton("Try Solution ${solution.number}").apply {
+        val smallButton = SmallButton("Copy Solution ${solution.number}").apply {
             addActionListener {
+                this.text = "Solution copied!"
+                this.icon = AllIcons.Actions.Checked
                 onButtonClicked(solution, project)
             }
         }
@@ -147,21 +151,8 @@ class SideSuggestionViewFactory : ToolWindowFactory {
         project: Project
     ) {
         ApiService.recordButtonClickedEvent(solution)
-        WriteCommandAction.runWriteCommandAction(
-            project
-        ) {
-            val editor = FileEditorManager.getInstance(project).selectedTextEditor!!
-            val caret = editor.caretModel.primaryCaret
-            var start = caret.selectionStart
-            var end = caret.selectionEnd
-            if (start == end) {
-                start = caret.visualLineStart
-                end = caret.visualLineEnd
-            }
-            val document = editor.document
-            document.deleteString(start, end)
-            document.insertString(start, solution.codeSnippet!!)
-        }
+        Toolkit.getDefaultToolkit().systemClipboard
+            .setContents(StringSelection(solution.codeSnippet!!), null)
     }
 
     private fun editorTextField(project: Project, text: String): EditorTextField {
