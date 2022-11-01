@@ -29,12 +29,17 @@ object ApiService {
                     }.mapIndexed { id, result ->
                         Solution(id, result.codeSnippet, null, result.url)
                     }
+                if (results.isEmpty()) {
+                    TelemetryService.instance.action("intellij_user_search_zero_results")
+                        .property("search.param", request.codeLine)
+                }
                 publisher.onNext(
                     SolutionResult(
-                        solutions = results
+                        solutions = results,
+                        language = request.language
                     )
                 )
-            } catch(ignored: NoSuchElementException) {
+            } catch (ignored: NoSuchElementException) {
 
             } catch (e: Exception) {
                 LOG.error(e)

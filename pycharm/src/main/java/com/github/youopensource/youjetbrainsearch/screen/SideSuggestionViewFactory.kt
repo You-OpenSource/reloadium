@@ -1,12 +1,12 @@
 package com.github.youopensource.youjetbrainsearch.screen
 
 import com.github.youopensource.youjetbrainsearch.data.Solution
+import com.github.youopensource.youjetbrainsearch.data.SolutionResult
 import com.github.youopensource.youjetbrainsearch.services.ApiService
 import com.github.youopensource.youjetbrainsearch.services.YouPreferences
 import com.intellij.icons.AllIcons
 import com.intellij.lang.Language
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.EditorSettings
 import com.intellij.openapi.editor.actions.IncrementalFindAction
@@ -61,7 +61,7 @@ class SideSuggestionViewFactory : ToolWindowFactory {
             border = JBUI.Borders.empty(5, 10, 10, 15)
         }
         dataProviderPanel!!.add(
-            createSettingsView()
+            createSettingsView("python")
         )
         dataProviderPanel!!.add(
             JBLabel("Loading...")
@@ -75,7 +75,7 @@ class SideSuggestionViewFactory : ToolWindowFactory {
                 return@subscribe
             }
             ApplicationManager.getApplication().invokeLater {
-                onSuggestion(it.solutions!!)
+                onSuggestion(it)
             }
         }, {
             ApplicationManager.getApplication().invokeLater {
@@ -85,13 +85,16 @@ class SideSuggestionViewFactory : ToolWindowFactory {
     }
 
 
-    private fun onSuggestion(solutionList: List<Solution>) {
+    private fun onSuggestion(result: SolutionResult) {
+        val solutionList = result.solutions!!
         cleanLayout()
+        dataProviderPanel?.add(createSettingsView(result.language!!))
         if (solutionList.isEmpty()) {
-            LOG.debug("No solutions were found, skipping UI")
+            val reason = "No solutions were found, try another selection"
+            dataProviderPanel?.add(JBLabel(reason))
+            LOG.debug(reason)
             return
         }
-        dataProviderPanel?.add(createSettingsView())
         solutionList.map { solution ->
             val elements = createCodeSuggestionView(project!!, solution)
             dataProviderPanel?.add(
@@ -115,13 +118,15 @@ class SideSuggestionViewFactory : ToolWindowFactory {
     }
 
 
-    private fun createSettingsView(): JCheckBox {
+    private fun createSettingsView(language: String): ToolbarPanel {
+        val panel = ToolbarPanel()
         val onlySelectionSearch = YouPreferences.getInstance().state.onlySelectionSearch
-        return CheckBox("Only search on selection", onlySelectionSearch, "If enabled").apply {
+        panel.add(CheckBox("Only search on selection ($language)", onlySelectionSearch, "If enabled").apply {
             addActionListener {
                 YouPreferences.getInstance().state.onlySelectionSearch = this.isSelected
             }
-        }
+        })
+        return panel
     }
 
     private fun createCodeSuggestionView(project: Project, solution: Solution): SuggestionPanel {
