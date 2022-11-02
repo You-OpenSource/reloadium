@@ -3,7 +3,7 @@
     <name>You.com with Reloadium - Hot Reloading &#38; Profiling for Python</name>
     <version>0.8.8</version>
     <idea-version since-build="203"/>
-    <vendor email="keith@you.com" url="you.com">You.com</vendor>
+    <vendor>You-OpenSource</vendor>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
     <depends>com.intellij.modules.platform</depends>
