@@ -64,7 +64,7 @@ class SideSuggestionViewFactory : ToolWindowFactory {
             createSettingsView("python")
         )
         dataProviderPanel!!.add(
-            JBLabel("Loading...")
+            JBLabel("Move caret or select text for suggestions")
         )
 
         val jbScrollPane = JBScrollPane(dataProviderPanel, 20, 31)

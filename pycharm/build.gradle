@@ -12,7 +12,7 @@ plugins {
 }
 
 group 'com.you'
-version '0.8.8' //  # RwRender: version '{{ ctx.version }}' //
+version '0.8.9' //  # RwRender: version '{{ ctx.version }}' //
 
 repositories {
     mavenCentral()
