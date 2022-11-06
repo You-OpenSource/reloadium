@@ -109,7 +109,11 @@ public class Environment {
                  * We thus currently dont have any better solution than use the country in the Locale.
                  */
                 ensureTimezone();
-                String country = Country.getInstance().get(timezone);
+                String country = null;
+                try {
+                    country = Country.getInstance().get(timezone);
+                } catch (Exception ignored) {
+                }
                 if (country == null) {
                     country = UNKNOWN_COUNTRY;
                 }

@@ -89,13 +89,13 @@ public class TelemetryService implements ITelemetryService {
     }
 
     private boolean isEnabled() {
-        return configuration != null
-                && configuration.isEnabled();
+        // We're getting consent on download
+        return true;
     }
 
     private boolean isConfigured() {
-        return configuration != null
-                && configuration.isConfigured();
+        // We're getting consent on download
+        return true;
     }
 
     private void flushOnHold() {
