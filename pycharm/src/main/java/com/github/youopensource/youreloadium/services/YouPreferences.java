@@ -8,7 +8,7 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 
-@State(name = "YouPreferences", storages = @Storage("youcom.xml"))
+@State(name = "YouReloadiumPreferences", storages = @Storage("youcom_reloadium.xml"))
 public class YouPreferences implements PersistentStateComponent<YouPreferencesState> {
     YouPreferencesState state = new YouPreferencesState();
 
