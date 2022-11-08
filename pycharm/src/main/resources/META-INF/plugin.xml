@@ -714,24 +714,24 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
-                serviceImplementation="com.redhat.devtools.intellij.telemetry.core.service.TelemetryServiceFactory"/>
-        <projectService serviceImplementation="com.github.youopensource.youjetbrainsearch.services.MyProjectService"/>
-        <applicationService serviceImplementation="com.github.youopensource.youjetbrainsearch.services.YouPreferences"/>
+                serviceImplementation="com.github.youopensource.redhat.devtools.intellij.telemetry.core.service.TelemetryServiceFactory"/>
+        <projectService serviceImplementation="com.github.youopensource.youreloadium.services.MyProjectService"/>
+        <applicationService serviceImplementation="com.github.youopensource.youreloadium.services.YouPreferences"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.youopensource.youjetbrainsearch.services.listeners.MyProjectManagerListener"
+        <listener class="com.github.youopensource.youreloadium.services.listeners.MyProjectManagerListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
                 parentId="tools"
-                instance="com.redhat.devtools.intellij.telemetry.ui.preferences.TelemetryConfigurable"
+                instance="com.github.youopensource.redhat.devtools.intellij.telemetry.ui.preferences.TelemetryConfigurable"
                 id="tools.preferences.youidesearch.telemetry"
                 displayName="YouIDESearch Telemetry"/>
-        <toolWindow id="You.com" secondary="true" icon="com.github.youopensource.youjetbrainsearch.YouIcons.YouLogo" anchor="right"
-                    factoryClass="com.github.youopensource.youjetbrainsearch.screen.SideSuggestionViewFactory"/>
+        <toolWindow id="You.com" secondary="true" icon="com.github.youopensource.youreloadium.YouIcons.YouLogo" anchor="right"
+                    factoryClass="com.github.youopensource.youreloadium.screen.SideSuggestionViewFactory"/>
     </extensions>
 
     <actions>
