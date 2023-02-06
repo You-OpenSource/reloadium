@@ -1,6 +1,10 @@
 package rw.profile;
 
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
+import rw.quickconfig.QuickConfig;
 import rw.session.events.LineProfile;
 
 import java.awt.*;
@@ -9,66 +13,81 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class LineProfiler {
-    Map<File, FileTiming> fileTimings;
+abstract public class LineProfiler {
+    Project project;
+    QuickConfig quickConfig;
 
-    public LineProfiler() {
-        this.fileTimings = new HashMap<>();
+    protected Map<File, FileValues> values;
+    ProfilePreviewRenderer previewRenderer;
+
+    public LineProfiler(Project project, QuickConfig quickConfig) {
+        this.quickConfig = quickConfig;
+        this.project = project;
+        this.values = new HashMap<>();
+        this.previewRenderer = new ProfilePreviewRenderer(this.project, this);
     }
 
     public void onLineProfileEvent(LineProfile event) {
-        this.fileTimings.putIfAbsent(event.getLocalPath(), new FileTiming());
-
-        FileTiming fileTiming = this.fileTimings.get(event.getLocalPath());
-        fileTiming.update(event.getTiming());
     }
 
-    public Map<File, FileTiming> getFileTimings() {
-        return fileTimings;
+    public Map<File, FileValues> getFileTimings() {
+        return values;
     }
 
     @Nullable
-    public Color getLineColor(File path, int line) {
-        FileTiming fileTiming = this.fileTimings.get(path);
-        if (fileTiming == null) {
+    public Color getLineColor(File path, int line, Editor editor) {
+        FileValues fileValues = this.values.get(path);
+        if (fileValues == null) {
             return null;
         }
 
-        return fileTiming.getLineColor(line);
+        return fileValues.getLineColor(line, editor, this.quickConfig.getState().getFrameScope(),
+                this.quickConfig.getState().getComulateType());
     }
 
     @Nullable
-    public Float getLineTimeMs(File path, int line) {
-        FileTiming fileTiming = this.fileTimings.get(path);
-        if (fileTiming == null) {
+    public Long getValue(File path, int line, Editor editor) {
+        FileValues fileValues = this.values.get(path);
+        if (fileValues == null) {
             return null;
         }
 
-        return fileTiming.getLineTimeMs(line);
-    }
-
-    @Nullable public Long getLineTimeNs(File path, int line) {
-        FileTiming fileTiming = this.fileTimings.get(path);
-        if (fileTiming == null) {
-            return null;
-        }
-
-        return fileTiming.getLineTimeNs(line);
+        Long ret = fileValues.getValue(line, editor, this.getQuickConfig().getState().getComulateType());
+        return ret;
     }
 
     public void clearFile(File path) {
-        FileTiming fileTiming = this.fileTimings.get(path);
-        if (fileTiming == null) {
+        FileValues fileValues = this.values.get(path);
+        if (fileValues == null) {
             return;
         }
-        fileTiming.clear();
+        fileValues.clear();
     }
 
     public void clearLines(File path, int start, int end) {
-        FileTiming fileTiming = this.fileTimings.get(path);
-        if (fileTiming == null) {
+        FileValues fileValues = this.values.get(path);
+        if (fileValues == null) {
             return;
         }
-        fileTiming.clearLines(start, end);
+        fileValues.clear(start, end);
+    }
+
+    public void activate() {
+        this.previewRenderer.activate();
+    }
+
+    public void deactivate() {
+        this.previewRenderer.deactivate();
+    }
+
+    @VisibleForTesting
+    public abstract String format(Long value);
+
+    public void update() {
+        this.previewRenderer.update();
+    }
+
+    public QuickConfig getQuickConfig() {
+        return this.quickConfig;
     }
 }

@@ -10,7 +10,6 @@ import rw.service.CodeCompletionService;
 
 abstract public class FileError extends FileEvent {
     public static final String ID = "FileError";
-    public static final String VERSION = "0.1.0";
 
     private Integer line;
     private String msg;

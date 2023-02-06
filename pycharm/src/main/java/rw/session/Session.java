@@ -1,7 +1,6 @@
 package rw.session;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
@@ -9,13 +8,13 @@ import org.jetbrains.annotations.VisibleForTesting;
 import rw.audit.RwSentry;
 import rw.handler.runConf.BaseRunConfHandler;
 import rw.session.cmds.Cmd;
-import rw.session.events.Action;
 import rw.session.events.*;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import static java.util.Map.entry;
 
 class RawEvent {
     public String ID;
-    public String VERSION;
 }
 
 class Client extends Thread {
@@ -55,9 +53,9 @@ class Client extends Thread {
 
     public void run() {
         try {
+            this.out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8),true);
+            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
 
-            this.out = new PrintWriter(this.socket.getOutputStream(), true);
-            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             String inputLine;
             try {
                 while ((inputLine = this.in.readLine()) != null) {
@@ -118,7 +116,6 @@ public class Session extends Thread {
     private Integer port = null;
     private final BaseRunConfHandler handler;
     private Map<String, Class<? extends Event>> events;
-    private Map<String, String> eventVersions;
     private List<Client> clients;
 
     public Session(Project project, BaseRunConfHandler handler) {
@@ -129,25 +126,16 @@ public class Session extends Thread {
         this.events = Map.ofEntries(
                 entry(Handshake.ID, Handshake.class),
                 entry(ModuleUpdate.ID, ModuleUpdate.class),
-                entry(FrameError.ID, FrameError.class),
+                entry(ThreadErrorEvent.ID, ThreadErrorEvent.class),
                 entry(LineProfile.ID, LineProfile.class),
                 entry(StackUpdate.ID, StackUpdate.class),
                 entry(UserError.ID, UserError.class),
                 entry(ClearErrors.ID, ClearErrors.class),
                 entry(LineProfileClear.ID, LineProfileClear.class),
-                entry(WatchingFiles.ID, WatchingFiles.class)
-        );
-
-        this.eventVersions = Map.ofEntries(
-                entry(Handshake.ID, Handshake.VERSION),
-                entry(ModuleUpdate.ID, ModuleUpdate.VERSION),
-                entry(FrameError.ID, FrameError.VERSION),
-                entry(LineProfile.ID, LineProfile.VERSION),
-                entry(UserError.ID, UserError.VERSION),
-                entry(StackUpdate.ID, StackUpdate.VERSION),
-                entry(ClearErrors.ID, ClearErrors.VERSION),
-                entry(LineProfileClear.ID, LineProfileClear.VERSION),
-                entry(WatchingFiles.ID, WatchingFiles.VERSION)
+                entry(WatchingFiles.ID, WatchingFiles.class),
+                entry(FrameDropped.ID, FrameDropped.class),
+                entry(UpdateDebugger.ID, UpdateDebugger.class),
+                entry(ClearThreadError.ID, ClearThreadError.class)
         );
 
         try {
@@ -170,13 +158,7 @@ public class Session extends Thread {
             LOGGER.warn("Unknown event " + event.ID);
             return null;
         }
-        String expectedVersion = this.eventVersions.get(event.ID);
 
-        if (!expectedVersion.equals(event.VERSION)) {
-            LOGGER.warn(String.format("Incompatible event versions for event type \"%s\" (expected=%s, got=%s)",
-                    event.ID, expectedVersion, event.VERSION));
-            return null;
-        }
         ret = g.fromJson(payload, eventClass);
         ret.setHandler(this.handler);
 
@@ -202,6 +184,10 @@ public class Session extends Thread {
         for (Client c : this.clients) {
             c.send(cmd);
         }
+    }
+
+    public BaseRunConfHandler getHandler() {
+        return handler;
     }
 
     public int getPort() {

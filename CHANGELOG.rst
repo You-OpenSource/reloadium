@@ -2,6 +2,120 @@ Change Log
 ##########
 
 
+0.9.10
+-------
+
+**Miscellaneous**:
+    
+  Added:
+    * Restarting non top frames
+    
+  Fixed:
+    * Not restarting frame on related files changes
+    
+**PyCharm**:
+    
+  Fixed:
+    * Crashing on None profiler
+    * Error message and highlighter not disappearing
+    * Execution highlighter not disappearing
+    
+  Added:
+    * Tooltip for profiler preview renderer
+    
+0.9.9
+-------
+
+**Miscellaneous**:
+    
+  Fixed:
+    * Dropping multiple frames after frame restarting issues
+    * Reloading flask views
+    
+  Added:
+    * Async generators support
+    
+**PyCharm**:
+    
+  Fixed:
+    * Jittery frame dropping visualisation
+    
+0.9.8
+-------
+
+**PyCharm**:
+    
+  Fixed:
+    * Error handling preferences issues
+    * M2 Chip issues
+    * Debugger in suspend mode after fixing an error
+    * Marking reloadable frames if non reloadable between
+    
+0.9.7
+-------
+
+**Miscellaneous**:
+    
+  Added:
+    * Handle adding and modifying dataclass class variables
+    * Make RW_DEBUG work in prod
+    
+  Fixed:
+    * Flask-sqlalchemy issues
+    
+**PyCharm**:
+    
+  Added:
+    * Error message on missing path mappings
+    * Profiling formatting improvements
+    * Collecting both memory and time information at the same time
+    * Profiling values folding
+    * Profiling color map frame scope
+    * Set as default buttons to quick config page
+    * Profiling cumulate type
+    * Highlighting reloadable frames in the call stack
+    * Add drop frame action (pop, reset frame)
+    * Hot reloading unhandled exceptions without breakpoint
+    
+  Fixed:
+    * Profiling sampling issue (blank values for 100ms lines)
+    * Detecting M1 issues
+    
+0.9.6
+-------
+
+**Miscellaneous**:
+    
+  Changed:
+    * Incompatible system message
+    
+**PyCharm**:
+    
+  Fixed:
+    * M1 installation compatibility issues
+    * Non ascii paths issues on save
+    * Not cleaning profile information
+    
+0.9.5
+-------
+
+**PyCharm**:
+    
+  Added:
+    * Quick config
+    * Memory line profiler
+    
+  Fixed:
+    * Detecting rosetta
+    * System PYTHONPATH not persisting issue
+    
+**Miscellaneous**:
+    
+  Fixed:
+    * Future imports and docstring issue
+    * Missing docstrings
+    * Non ascii paths issues
+    
 0.9.4
 -------
 

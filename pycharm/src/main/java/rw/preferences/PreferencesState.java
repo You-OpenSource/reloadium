@@ -1,18 +1,18 @@
 package rw.preferences;
 
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
-import rw.util.colormap.ColorMap;
+import rw.quickconfig.CumulateType;
+import rw.quickconfig.ErrorHandlingMode;
+import rw.quickconfig.ProfilerType;
 import rw.util.colormap.ColorMaps;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class PreferencesState {
     public int blinkDuration;
     public String timingColorMap;
+    public ProfilerType defaultProfiler;
+    public boolean defaultFrameScope;
+    public CumulateType defaultCumulateType;
+    public ErrorHandlingMode defaultErrorHandlingMode;
+
     public boolean sentry;
     public boolean telemetry;
     public boolean markReloadable;
@@ -23,6 +23,10 @@ public class PreferencesState {
         this.sentry = true;
         this.markReloadable = true;
         this.timingColorMap = ColorMaps.get().viridis.getName();
+        this.defaultProfiler = ProfilerType.DEFAULT;
+        this.defaultFrameScope = true;
+        this.defaultCumulateType = CumulateType.DEFAULT;
+        this.defaultErrorHandlingMode = ErrorHandlingMode.DEFAULT;
     }
 
     @Override
@@ -37,6 +41,10 @@ public class PreferencesState {
         ret &= this.sentry == that.sentry;
         ret &= this.markReloadable == that.markReloadable;
         ret &= this.telemetry == that.telemetry;
+        ret &= this.defaultProfiler == that.defaultProfiler;
+        ret &= this.defaultFrameScope == that.defaultFrameScope;
+        ret &= this.defaultCumulateType == that.defaultCumulateType;
+        ret &= this.defaultErrorHandlingMode == that.defaultErrorHandlingMode;
         return ret;
     }
 }

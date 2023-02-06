@@ -56,8 +56,7 @@ public class TestSession extends BaseMockedTestCase {
         PythonRunConfHandler handler = (PythonRunConfHandler) RunConfHandlerFactory.factory(cakeshop.getRunConf());
         Session session = new Session(this.getProject(), handler);
 
-        String payload = String.format("{\"ID\": \"Handshake\", \"VERSION\": \"%s\", \"version\": \"2.3.1\"}",
-                Handshake.VERSION);
+        String payload = String.format("{\"ID\": \"Handshake\", \"version\": \"2.3.1\"}");
         Handshake event = (Handshake) session.eventFactory(payload);
         assertThat(event).isInstanceOf(Handshake.class);
         assertThat(event.getVersion()).isEqualTo("2.3.1");
@@ -77,8 +76,7 @@ public class TestSession extends BaseMockedTestCase {
         FileUtils.write(file, "1\n2\n3\n4", "utf-8");
         file.createNewFile();
 
-        String payload = String.format("{\"ID\": \"UserError\", \"VERSION\": \"%s\", \"path\": \"%s\", \"line\": 2, \"msg\": \"msg\"}",
-                UserError.VERSION, file);
+        String payload = String.format("{\"ID\": \"UserError\", \"path\": \"%s\", \"line\": 2, \"msg\": \"msg\"}", file);
         UserError event = (UserError) session.eventFactory(payload);
         assertThat(event).isInstanceOf(UserError.class);
         assertThat(event.getPath()).isEqualTo(file);
@@ -88,31 +86,6 @@ public class TestSession extends BaseMockedTestCase {
         verify(this.dialogFactoryFixture.dialogFactory, times(1)).showFirstUserErrorDialog(this.getProject());
         verify(handler.getErrorHighlightManager(), times(1)).add(
                 eq(file), eq(2), eq("msg"));
-    }
-
-    @Test
-    public void testFrameError() throws Exception {
-        PythonRunConfHandler handler = (PythonRunConfHandler) RunConfHandlerFactory.factory(cakeshop.getRunConf());
-        HighlightManagerFixture highlightManagerFixture = new HighlightManagerFixture(handler);
-        highlightManagerFixture.start();
-
-        Session session = new Session(this.getProject(), handler);
-
-        File file = new File(this.cakeshop.getRoot().toString(), "cakeshop.py");
-        FileUtils.write(file, "1\n2\n3\n4", "utf-8");
-        file.createNewFile();
-
-        String payload = String.format("{\"ID\": \"FrameError\", \"VERSION\": \"%s\", " +
-                        "\"line\": 2, \"path\": \"%s\"," +
-                        "\"msg\": \"msg\"}",
-                FrameError.VERSION, file);
-        FrameError event = (FrameError) session.eventFactory(payload);
-        assertThat(event).isInstanceOf(FrameError.class);
-        assertThat(event.getLine()).isEqualTo(2);
-
-        event.handle();
-        verify(this.dialogFactoryFixture.dialogFactory, times(1)).showFirstFrameErrorDialog(this.getProject());
-        verify(handler.getErrorHighlightManager(), times(1)).add(eq(file), eq(2), eq("msg"));
     }
 
     @Test
@@ -127,10 +100,9 @@ public class TestSession extends BaseMockedTestCase {
         FileUtils.write(file, "1\n2\n3\n4", "utf-8");
         file.createNewFile();
 
-        String payload = String.format("{\"ID\": \"ModuleUpdate\", \"VERSION\": \"%s\", \"path\": \"%s\", " +
+        String payload = String.format("{\"ID\": \"ModuleUpdate\", \"path\": \"%s\", " +
                         "\"actions\": [{\"name\": \"Update\", \"obj\": \"Function\"," +
-                        " \"line_start\": 2, \"line_end\": 4}]}",
-                ModuleUpdate.VERSION, file.getAbsolutePath());
+                        " \"line_start\": 2, \"line_end\": 4}]}", file.getAbsolutePath());
 
         ModuleUpdate event = (ModuleUpdate) session.eventFactory(payload);
         assertThat(event).isInstanceOf(ModuleUpdate.class);
@@ -144,23 +116,5 @@ public class TestSession extends BaseMockedTestCase {
         assertThat(action.getObj()).isEqualTo("Function");
 
         event.handle();
-    }
-
-    @Test
-    public void testIncompatible() throws Exception {
-        PythonRunConfHandler handler = (PythonRunConfHandler) RunConfHandlerFactory.factory(cakeshop.getRunConf());
-        HighlightManagerFixture highlightManagerFixture = new HighlightManagerFixture(handler);
-        highlightManagerFixture.start();
-
-        Session session = new Session(this.getProject(), handler);
-
-        File file = new File(this.cakeshop.getRoot().toString(), "cakeshop.py");
-        FileUtils.write(file, "1\n2\n3\n4", "utf-8");
-        file.createNewFile();
-
-        String payload = "{\"ID\": \"UpdateModule\", \"VERSION\": \"0.0.0\"}";
-
-        ModuleUpdate event = (ModuleUpdate) session.eventFactory(payload);
-        assertThat(event).isNull();
     }
 }
