@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>com.you</id>
-    <name>You.com with Reloadium - Hot Reloading &#38; Profiling for Python</name>
+    <name>You.com Python Edit and Continue</name>
     <version>0.9.5</version>
     <idea-version since-build="221"/>
     <vendor>You-OpenSource</vendor>
@@ -16,7 +16,7 @@
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/profiling.gif" width="600px" alt="Profiling"/>
         </div>
         
-         <p>You.com with Reloadium. <p>
+         <p>You.com Python Edit and Continue. <p>
          This plugin is a fork of Reloadium with You.com Copilot to automatically
           fix the Python runtime errors that Reloadium found.<br>
          Reloadium adds hot reloading and profiling features to any Python application</p>
