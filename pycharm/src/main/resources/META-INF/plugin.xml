@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.you</id>
     <name>You.com Python Edit and Continue</name>
-    <version>0.9.5</version>
+    <version>0.9.6</version>
     <idea-version since-build="221"/>
     <vendor>You-OpenSource</vendor>
     <depends>com.intellij.modules.lang</depends>
