@@ -1,73 +1,53 @@
 package rw.service;
 
 import com.intellij.concurrency.JobScheduler;
-import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
-import com.intellij.xdebugger.XDebuggerManager;
-import com.intellij.xdebugger.impl.XDebugSessionImpl;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
-import org.kohsuke.rngom.parse.host.Base;
+import rw.ai.context.ContextManager;
 import rw.audit.RwSentry;
-import rw.consts.Const;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.pkg.BuiltinPackageManager;
-import rw.pkg.WebPackageManager;
+import rw.pkg.PackageManager;
+import rw.remote.RemoteSdkChecker;
 import rw.util.OsType;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
 public class Service implements Disposable {
     private static final Logger LOGGER = Logger.getInstance(Service.class);
-    @VisibleForTesting
-    public BuiltinPackageManager builtinPackageManager;
-    @VisibleForTesting
-    public WebPackageManager webPackageManager;
-
     public static Service singleton = null;
-
+    private static int runCounter = 0;
+    private final RemoteSdkChecker remoteSdkChecker;
     @VisibleForTesting
+    public PackageManager packageManager;
+
     public Service() {
         LOGGER.info("Starting service");
-        this.webPackageManager = new WebPackageManager();
-        this.builtinPackageManager = new BuiltinPackageManager();
+        this.packageManager = new PackageManager();
+        this.remoteSdkChecker = new RemoteSdkChecker();
         this.validateOsType();
         this.init();
-    }
-
-    public void init() {
-        LOGGER.info("Initializing service");
-        this.builtinPackageManager.run(null);
-
-        JobScheduler.getScheduler().scheduleWithFixedDelay(this::checkForUpdate, 1,
-                Const.get().checkForUpdateInterval, TimeUnit.HOURS);
-
-        JobScheduler.getScheduler().scheduleWithFixedDelay(this::checkIfStillGood, 2,
-                10, TimeUnit.MINUTES);
     }
 
     public static Service get() {
         if (singleton == null) {
             singleton = ApplicationManager.getApplication().getService(Service.class);
         }
-
         return singleton;
     }
 
-    public WebPackageManager getPackageManager(){
-        return this.webPackageManager;
-    }
+    public void init() {
+        LOGGER.info("Initializing service");
+        this.packageManager.run(null, true);
+        ContextManager.get().addListeners(this);
 
-    public boolean canRun(RunnerAndConfigurationSettings settings) {
-        return this.webPackageManager.getCurrentVersion() != null;
+        JobScheduler.getScheduler().scheduleWithFixedDelay(this::checkIfStillGood, 2,
+                10, TimeUnit.MINUTES);
+
+        JobScheduler.getScheduler().scheduleWithFixedDelay(this.remoteSdkChecker::check, 30,
+                60, TimeUnit.SECONDS);
     }
 
     private void validateOsType() {
@@ -77,22 +57,31 @@ public class Service implements Disposable {
         }
     }
 
-    public void checkForUpdate() {
-        LOGGER.info("Checking for update");
-
-        this.webPackageManager.run(null);
-    }
-
     public void checkIfStillGood() {
         LOGGER.info("Checking if still good");
-        if (this.builtinPackageManager.shouldInstall() && !this.builtinPackageManager.isInstalling()) {
+        if (this.packageManager.shouldInstall() && !this.packageManager.isInstalling()) {
             LOGGER.info("Not good, installing builtin package");
-            this.builtinPackageManager.run(null);
+            this.packageManager.run(null, true);
         }
+    }
+
+    public PackageManager getPackageManager() {
+        return this.packageManager;
+    }
+
+    public RemoteSdkChecker getRemoteSdkChecker() {
+        return this.remoteSdkChecker;
     }
 
     @Override
     public void dispose() {
+    }
 
+    public void onRun() {
+        runCounter += 1;
+    }
+
+    public int getRunCounter() {
+        return runCounter;
     }
 }

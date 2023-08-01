@@ -1,6 +1,8 @@
 build
+build_cpy
 .gradle
 reloadium-*.zip
 video
 common
 .DS_Store
+**/temp:/

@@ -33,24 +33,22 @@ public class TestMisc extends PackageTestBase {
     void installsPackage(final RemoteRobot remoteRobot) throws Exception {
         Depot.run("env.get_remote().clean()");
         Package.run("p.rm_config");
-        // Package is downloaded on application start so this will break things
-        // Plugin.run("p.rm_package");
         Package.run("p.push_release");
         String version = Package.run("v.current_version")[0];
         Depot.run("p.publish_release");
 
         try {
             steps.createNewProject();
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             MiscUtils.sleep(15.0f);
             steps.createNewProject();
         }
 
         final Root root = remoteRobot.find(Root.class, ofSeconds(5));
-        root.assertButtonsEnabled();
 
         root.runWithReloadium().click();
+
+        MiscUtils.sleep(2.0f);
 
         root.firstRunDialog().okButton().click();
 

@@ -6,55 +6,45 @@ import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.compound.CompoundRunConfiguration;
 import com.intellij.execution.compound.CompoundRunConfigurationType;
 import com.intellij.execution.impl.RunManagerImpl;
-import com.intellij.ide.highlighter.ModuleFileType;
-import com.intellij.openapi.application.WriteAction;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
-import com.intellij.openapi.projectRoots.impl.SdkConfigurationUtil;
-import com.jetbrains.python.packaging.PyPackageManager;
-import com.jetbrains.python.run.AbstractPythonRunConfiguration;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
+import com.intellij.testFramework.fixtures.TempDirTestFixture;
+import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 import com.jetbrains.python.run.PythonConfigurationType;
 import com.jetbrains.python.run.PythonRunConfiguration;
-import com.jetbrains.python.sdk.PyDetectedSdk;
-import com.jetbrains.python.sdk.PythonSdkType;
-import com.jetbrains.rest.run.RestRunConfigurationType;
-import com.jetbrains.rest.run.docutils.DocutilsRunConfiguration;
-import rw.tests.utils.MiscUtils;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 public class CakeshopFixture {
+    public String PYTHON_VERSION = "3.9";
     protected RunnerAndConfigurationSettings settings;
     protected PythonRunConfiguration runConf;
-
     protected RunnerAndConfigurationSettings nonPySettings;
     protected CompoundRunConfiguration nonPyConf;
-    protected File source;
-    protected File venvDir;
-    protected Path root;
+    protected VirtualFile root;
     protected SdkFixture sdkFixture;
     protected Project project;
+    protected CodeInsightTestFixture f;
 
-    public CakeshopFixture(Project project) throws Exception {
-        this.project = project;
+    public CakeshopFixture(CodeInsightTestFixture f) throws Exception {
+        this.f = f;
+        this.project = f.getProject();
     }
 
-    public void start() throws Exception {
+    public void setUp() throws Exception {
         // Create source
-        this.root = Path.of(Files.createTempDirectory("cakeshop").toFile().getAbsolutePath());
-        this.sdkFixture = new SdkFixture(this.root.toFile(), "3.9");
-
-        this.source = Path.of(root.toString(), "main.py" ).toFile();
-        String body = Files.readString(Path.of(this.getClass().getClassLoader().getResource("cakeshop.py").getFile()));
-        Files.writeString(this.source.toPath(), body);
+        this.root = this.f.getTempDirFixture().findOrCreateDir("cakeshop");
+        this.sdkFixture = new SdkFixture(this.PYTHON_VERSION);
 
         // Create settings
         RunManager runManager = RunManager.getInstance(project);
@@ -64,8 +54,8 @@ public class CakeshopFixture {
 
         // Create runConf
         this.runConf = (PythonRunConfiguration) this.settings.getConfiguration();
-        this.runConf.setWorkingDirectory(root.toString());
-        this.runConf.setScriptName(this.source.getName());
+        this.runConf.setWorkingDirectory(this.root.toString());
+        this.runConf.setScriptName("cakeshop.py");
 
         // Create non Python settings
         this.nonPySettings = runManager.createConfiguration("testNonPyConfig", CompoundRunConfigurationType.class);
@@ -73,15 +63,14 @@ public class CakeshopFixture {
         this.nonPyConf = (CompoundRunConfiguration) this.nonPySettings.getConfiguration();
 
         // Create sdk
-        this.venvDir = new File(this.root.toString(), ".venv");
         this.sdkFixture.start();
-        this.runConf.setSdkHome(this.sdkFixture.getSdkHome().toString());
+        this.runConf.setSdkHome(this.sdkFixture.getSdk().getHomePath());
 
         RunManagerConfig config = RunManagerImpl.getInstanceImpl(this.project).getConfig();
         config.setRestartRequiresConfirmation(false);
     }
 
-    public void stop() {
+    public void tearDown() throws Exception {
         RunManager runManager = RunManager.getInstance(project);
 
         runManager.removeConfiguration(this.settings);
@@ -102,7 +91,7 @@ public class CakeshopFixture {
         return this.runConf;
     }
 
-    public Path getRoot() {
+    public VirtualFile getRoot() {
         return this.root;
     }
 

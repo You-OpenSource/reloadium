@@ -1,26 +1,32 @@
 package rw.preferences;
 
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
-import rw.util.colormap.ColorMap;
+import rw.quickconfig.CumulateType;
+import rw.quickconfig.ErrorHandlingMode;
+import rw.quickconfig.ProfilerType;
 import rw.util.colormap.ColorMaps;
-
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class PreferencesState {
     public int blinkDuration;
     public String timingColorMap;
-    public boolean sentry;
-    public boolean telemetry;
+    public ProfilerType defaultProfiler;
+    public boolean defaultFrameScope;
+    public CumulateType defaultCumulateType;
+    public ErrorHandlingMode defaultErrorHandlingMode;
+    public boolean alwaysCollectMemory;
+
+    public boolean markReloadable;
+    public boolean runtimeCompletion;
 
     public PreferencesState() {
         this.blinkDuration = 1000;
-        this.telemetry = true;
-        this.sentry = true;
+        this.markReloadable = true;
         this.timingColorMap = ColorMaps.get().viridis.getName();
+        this.defaultProfiler = ProfilerType.DEFAULT;
+        this.defaultFrameScope = true;
+        this.defaultCumulateType = CumulateType.DEFAULT;
+        this.defaultErrorHandlingMode = ErrorHandlingMode.DEFAULT;
+        this.alwaysCollectMemory = false;
+        this.runtimeCompletion = true;
     }
 
     @Override
@@ -32,8 +38,13 @@ public class PreferencesState {
         boolean ret;
         ret = this.blinkDuration == that.blinkDuration;
         ret &= this.timingColorMap.equals(that.timingColorMap);
-        ret &= this.sentry == that.sentry;
-        ret &= this.telemetry == that.telemetry;
+        ret &= this.markReloadable == that.markReloadable;
+        ret &= this.defaultProfiler == that.defaultProfiler;
+        ret &= this.defaultFrameScope == that.defaultFrameScope;
+        ret &= this.defaultCumulateType == that.defaultCumulateType;
+        ret &= this.defaultErrorHandlingMode == that.defaultErrorHandlingMode;
+        ret &= this.alwaysCollectMemory == that.alwaysCollectMemory;
+        ret &= this.runtimeCompletion == that.runtimeCompletion;
         return ret;
     }
 }

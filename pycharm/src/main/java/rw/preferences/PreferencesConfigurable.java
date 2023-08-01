@@ -1,9 +1,7 @@
 package rw.preferences;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NonNls;
@@ -15,11 +13,9 @@ import javax.swing.*;
 
 public class PreferencesConfigurable implements Configurable, SearchableConfigurable, Configurable.NoScroll {
     PreferencesForm form;
-    Preferences preferences;
 
     PreferencesConfigurable() {
         this.form = new PreferencesForm();
-        this.preferences = Preferences.getInstance();
     }
 
     @Override
@@ -34,17 +30,17 @@ public class PreferencesConfigurable implements Configurable, SearchableConfigur
 
     @Override
     public boolean isModified() {
-        return !this.form.getState().equals(this.preferences.getState());
+        return !this.form.getState().equals(Preferences.getInstance().getState());
     }
 
     @Override
-    public void apply() throws ConfigurationException {
-        this.preferences.loadState(this.form.getState());
+    public void apply() {
+        Preferences.getInstance().loadState(this.form.getState());
     }
 
     @Override
     public void reset() {
-        this.form.setState(this.preferences.getState());
+        this.form.setState(Preferences.getInstance().getState());
     }
 
     @Override

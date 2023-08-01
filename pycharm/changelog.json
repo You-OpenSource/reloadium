@@ -1,4 +1,904 @@
 {
+  "1.2.0": [
+    {
+      "type": "Added",
+      "description": "Files with breakpoints are reloadable",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Ignore special functions like __getattr__, __repr__ from handling exceptions (Unless with a breakpoint)",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Exception handling speed improvements",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Breakpoint always hit on functions last lines",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Persisting current line indicators",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Not switching thread errors",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Processing files progress",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Uploading reloadium package to remote interpreters improvements",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Not handling errors during stepping when wrapped in try from outside",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Jittery stepping into",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Drop frame improvements",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Removed",
+      "description": "Drop frame support for python <= 3.9",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Not updating debugger after frame reload",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Function mementos when stepping into",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Function local completion not working in remote development",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Syntax errors not clearing",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Debug logging when RW_DEBUG=True",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Not breaking in closures",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Frame reloading closures",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Handling errors in closures",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Closure parent function not restarting",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Current File run configuration support",
+      "tag": "PyCharm",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Running with reloadium results in normal run when started too quickly.",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Profile child frames when stepping",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Encoding issues",
+      "tag": "Miscellaneous",
+      "date": "2023-06-26"
+    },
+    {
+      "type": "Added",
+      "description": "Better asyncio support",
+      "tag": "Miscellaneous",
+      "date": "2023-07-01"
+    },
+    {
+      "type": "Added",
+      "description": "Only scroll to error if not visible",
+      "tag": "PyCharm",
+      "date": "2023-07-01"
+    },
+    {
+      "type": "Fixed",
+      "description": "Circular import dependency issues for bigger projects",
+      "tag": "Miscellaneous",
+      "date": "2023-07-05"
+    }
+  ],
+  "1.1.1": [
+    {
+      "type": "Added",
+      "description": "Add change context button",
+      "tag": "AI",
+      "date": "2023-04-23"
+    },
+    {
+      "type": "Added",
+      "description": "Resizable code viewer",
+      "tag": "AI",
+      "date": "2023-04-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "Hyperlinks not working in markdown",
+      "tag": "AI",
+      "date": "2023-04-23"
+    },
+    {
+      "type": "Added",
+      "description": "High contrast mode improvements",
+      "tag": "AI",
+      "date": "2023-04-23"
+    },
+    {
+      "type": "Added",
+      "description": "Set caret position to error location",
+      "tag": "PyCharm",
+      "date": "2023-04-23"
+    },
+    {
+      "type": "Removed",
+      "description": "3.7 support",
+      "tag": "Miscellaneous",
+      "date": "2023-05-14"
+    },
+    {
+      "type": "Fixed",
+      "description": "Code viewer not persisting extensions",
+      "tag": "AI",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Jitters when typing",
+      "tag": "PyCharm",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Added",
+      "description": "Dictionary runtime completion improvements",
+      "tag": "PyCharm",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Added",
+      "description": "Reloading non suspended frames (in debug mode)",
+      "tag": "Miscellaneous",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Multiple runtime completion markers in the gutter issues",
+      "tag": "PyCharm",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Runtime completion indicator not working for remote interpreters",
+      "tag": "PyCharm",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Mementos crashing for non async functions in async context",
+      "tag": "Miscellaneous",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Added",
+      "description": "Sources to replies in square bracket notation",
+      "tag": "AI",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Not profiling when using freezegun",
+      "tag": "Miscellaneous",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Wrong lines for method context",
+      "tag": "AI",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Added",
+      "description": "Pytest speedups",
+      "tag": "Miscellaneous",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Stripping docstrings in Python 3.11",
+      "tag": "Miscellaneous",
+      "date": "2023-05-16"
+    },
+    {
+      "type": "Fixed",
+      "description": "Infinite recursion issue for big projects",
+      "tag": "Miscellaneous",
+      "date": "2023-05-16"
+    }
+  ],
+  "1.1.0": [
+    {
+      "type": "Added",
+      "description": "ChatGPT integration",
+      "tag": "PyCharm",
+      "date": "2023-04-15"
+    },
+    {
+      "type": "Added",
+      "description": "UI Improvements",
+      "tag": "PyCharm",
+      "date": "2023-04-15"
+    },
+    {
+      "type": "Fixed",
+      "description": "Fix ComparableVersion issues",
+      "tag": "PyCharm",
+      "date": "2023-04-16"
+    }
+  ],
+  "1.0.1": [
+    {
+      "type": "Added",
+      "description": "Python 3.11 support",
+      "tag": "Miscellaneous",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Fixed",
+      "description": "Remote interpreters saving issues",
+      "tag": "PyCharm",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Fixed",
+      "description": "Missing () when completing functions",
+      "tag": "PyCharm",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Fixed",
+      "description": "Profiler concurrency issues",
+      "tag": "PyCharm",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Fixed",
+      "description": "Too many whitespaces in completion tail",
+      "tag": "PyCharm",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Fixed",
+      "description": "Apple silicon rosetta support",
+      "tag": "PyCharm",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Fixed",
+      "description": "Completion not working for selected frame in evaluate",
+      "tag": "PyCharm",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Fixed",
+      "description": "Docker compose interpreter not working",
+      "tag": "PyCharm",
+      "date": "2023-03-20"
+    },
+    {
+      "type": "Added",
+      "description": "Multiline error rendering",
+      "tag": "PyCharm",
+      "date": "2023-03-21"
+    }
+  ],
+  "1.0.0": [
+    {
+      "type": "Added",
+      "description": "Dropping module frames for M1",
+      "tag": "Miscellaneous",
+      "date": "2023-03-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Assertion error in fast debug mode when no breakpoints present",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Fixed",
+      "description": "Completion issues when not suspended",
+      "tag": "PyCharm",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Added",
+      "description": "Completion in run mode",
+      "tag": "PyCharm",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Fixed",
+      "description": "Slow action on EDT issues",
+      "tag": "PyCharm",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Fixed",
+      "description": "Wrong error lines in fast debug mode",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Added",
+      "description": "Add __doc__ to function calls completion",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Added",
+      "description": "Runtime completion for evaluate mode",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Fixed",
+      "description": "Reloading issues when using snoop library",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Fixed",
+      "description": "Celery noreload flag issue",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Fixed",
+      "description": "Cannot retrieve frame symbol issues",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Added",
+      "description": "Numpy __doc__ style completion support",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Added",
+      "description": "FastApi support",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Fixed",
+      "description": "Cannot drop module frame on M1",
+      "tag": "Miscellaneous",
+      "date": "2023-03-04"
+    },
+    {
+      "type": "Added",
+      "description": "Hot reloading docstrings",
+      "tag": "Miscellaneous",
+      "date": "2023-03-06"
+    },
+    {
+      "type": "Removed",
+      "description": "Telemetry, sentry opt out",
+      "tag": "Miscellaneous",
+      "date": "2023-03-06"
+    }
+  ],
+  "0.9.6": [
+    {
+      "type": "Fixed",
+      "description": "No reload decorator in function and module frames issues",
+      "tag": "Miscellaneous",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "Fast debug",
+      "tag": "Miscellaneous",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "Always collect memory info option",
+      "tag": "PyCharm",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Frame progress not showing on first slow line",
+      "tag": "PyCharm",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "New UI support",
+      "tag": "PyCharm",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Null pointer exception when dropping frames",
+      "tag": "PyCharm",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "Async mementos support",
+      "tag": "Miscellaneous",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "Multithreaded frame errors support ",
+      "tag": "PyCharm",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "Runtime completion",
+      "tag": "PyCharm",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "Remote development automatic package upload",
+      "tag": "PyCharm",
+      "date": "2023-02-26"
+    },
+    {
+      "type": "Added",
+      "description": "Centering editor on errors",
+      "tag": "PyCharm",
+      "date": "2023-02-27"
+    }
+  ],
+  "0.9.5": [
+    {
+      "type": "Added",
+      "description": "Restarting non top frames",
+      "tag": "Miscellaneous",
+      "date": "2023-01-25"
+    },
+    {
+      "type": "Fixed",
+      "description": "Not restarting frame on related files changes",
+      "tag": "Miscellaneous",
+      "date": "2023-01-25"
+    },
+    {
+      "type": "Fixed",
+      "description": "Crashing on None profiler",
+      "tag": "PyCharm",
+      "date": "2023-01-25"
+    },
+    {
+      "type": "Added",
+      "description": "Tooltip for profiler preview renderer",
+      "tag": "PyCharm",
+      "date": "2023-01-25"
+    },
+    {
+      "type": "Fixed",
+      "description": "Error message and highlighter not disappearing",
+      "tag": "PyCharm",
+      "date": "2023-01-26"
+    },
+    {
+      "type": "Fixed",
+      "description": "Execution highlighter not disappearing",
+      "tag": "PyCharm",
+      "date": "2023-01-26"
+    }
+  ],
+  "0.9.4": [
+    {
+      "type": "Fixed",
+      "description": "Dropping multiple frames after frame restarting issues",
+      "tag": "Miscellaneous",
+      "date": "2023-01-24"
+    },
+    {
+      "type": "Fixed",
+      "description": "Jittery frame dropping visualisation",
+      "tag": "PyCharm",
+      "date": "2023-01-24"
+    },
+    {
+      "type": "Added",
+      "description": "Async generators support",
+      "tag": "Miscellaneous",
+      "date": "2023-01-24"
+    },
+    {
+      "type": "Fixed",
+      "description": "Reloading flask views",
+      "tag": "Miscellaneous",
+      "date": "2023-01-24"
+    }
+    ],
+    "0.9.3": [
+    {
+      "type": "Fixed",
+      "description": "Error handling preferences issues",
+      "tag": "PyCharm",
+      "date": "2023-01-22"
+    },
+    {
+      "type": "Fixed",
+      "description": "M2 Chip issues",
+      "tag": "PyCharm",
+      "date": "2023-01-22"
+    },
+    {
+      "type": "Fixed",
+      "description": "Debugger in suspend mode after fixing an error",
+      "tag": "PyCharm",
+      "date": "2023-01-22"
+    },
+    {
+      "type": "Fixed",
+      "description": "Marking reloadable frames if non reloadable between",
+      "tag": "PyCharm",
+      "date": "2023-01-22"
+    }
+  ],
+  "0.9.2": [
+    {
+      "type": "Added",
+      "description": "Handle adding and modifying dataclass class variables",
+      "tag": "Miscellaneous",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Error message on missing path mappings",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Profiling formatting improvements",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Fixed",
+      "description": "Profiling sampling issue (blank values for 100ms lines)",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Collecting both memory and time information at the same time",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Profiling values folding",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Profiling color map frame scope",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Set as default buttons to quick config page",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Profiling cumulate type",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Fixed",
+      "description": "Flask-sqlalchemy issues",
+      "tag": "Miscellaneous",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Make RW_DEBUG work in prod",
+      "tag": "Miscellaneous",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Highlighting reloadable frames in the call stack",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Add drop frame action (pop, reset frame)",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Fixed",
+      "description": "Detecting M1 issues",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    },
+    {
+      "type": "Added",
+      "description": "Hot reloading unhandled exceptions without breakpoint",
+      "tag": "PyCharm",
+      "date": "2023-01-17"
+    }
+  ],
+  "0.9.1": [
+    {
+      "type": "Changed",
+      "description": "Incompatible system message",
+      "tag": "Miscellaneous",
+      "date": "2022-11-29"
+    },
+    {
+      "type": "Fixed",
+      "description": "M1 installation compatibility issues",
+      "tag": "PyCharm",
+      "date": "2022-11-29"
+    },
+    {
+      "type": "Fixed",
+      "description": "Non ascii paths issues on save",
+      "tag": "PyCharm",
+      "date": "2022-11-29"
+    },
+    {
+      "type": "Fixed",
+      "description": "Not cleaning profile information",
+      "tag": "PyCharm",
+      "date": "2022-11-29"
+    }
+  ],
+  "0.9.0": [
+    {
+      "type": "Added",
+      "description": "Quick config",
+      "tag": "PyCharm",
+      "date": "2022-11-21"
+    },
+    {
+      "type": "Added",
+      "description": "Memory line profiler",
+      "tag": "PyCharm",
+      "date": "2022-11-21"
+    },
+    {
+      "type": "Fixed",
+      "description": "Future imports and docstring issue",
+      "tag": "Miscellaneous",
+      "date": "2022-11-21"
+    },
+    {
+      "type": "Fixed",
+      "description": "Missing docstrings",
+      "tag": "Miscellaneous",
+      "date": "2022-11-21"
+    },
+    {
+      "type": "Fixed",
+      "description": "Non ascii paths issues",
+      "tag": "Miscellaneous",
+      "date": "2022-11-21"
+    },
+    {
+      "type": "Fixed",
+      "description": "Detecting rosetta",
+      "tag": "PyCharm",
+      "date": "2022-11-21"
+    },
+    {
+      "type": "Fixed",
+      "description": "System PYTHONPATH not persisting issue",
+      "tag": "PyCharm",
+      "date": "2022-11-21"
+    },
+    {
+      "type": "Fixed",
+      "description": "Remote interpreter issues in 2022.2.3",
+      "tag": "Miscellaneous",
+      "date": "2022-11-21"
+    }
+  ],
+  "0.8.8": [
+    {
+      "type": "Fixed",
+      "description": "Empty working directory issues",
+      "tag": "Miscellaneous",
+      "date": "2022-10-24"
+    }
+  ],
+  "0.8.7": [
+    {
+      "type": "Fixed",
+      "description": "Fix adding from import items issue",
+      "tag": "Miscellaneous",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "Fix windows multiprocessing bugs",
+      "tag": "Miscellaneous",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Added",
+      "description": "Easier downgrading",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Removed",
+      "description": "Package autoupdater",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "Confusing RELOADIUMPATH message when no files are watched",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "Remote interpreter issues for new PyCharm versions",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    },
+    {
+      "type": "Fixed",
+      "description": "View pane null pointer exception",
+      "tag": "PyCharm",
+      "date": "2022-10-23"
+    }
+  ],
+  "0.8.6": [
+    {
+      "type": "Fixed",
+      "description": "Encoding issues",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Import threading issues",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Multiprocessing extension",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Manual reload file command",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Symlinks and mounted directories support",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Reloadable files highlighting",
+      "tag": "PyCharm",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Added",
+      "description": "Manual reload action",
+      "tag": "PyCharm",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Multiprocessing issues",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Double popup issue on FrameError",
+      "tag": "Miscellaneous",
+      "date": "2022-10-03"
+    },
+    {
+      "type": "Fixed",
+      "description": "Too many open files issue",
+      "tag": "PyCharm",
+      "date": "2022-10-03"
+    }
+  ],
   "0.8.5": [
     {
       "type": "Added",

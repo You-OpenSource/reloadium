@@ -1,8 +1,8 @@
 package rw.tests.utils;
 
 import rw.consts.Const;
-import rw.pkg.Architecture;
-import rw.util.OsType;
+import rw.pkg.PackageManager;
+import rw.pkg.wheel.BaseWheel;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,8 +46,7 @@ public class MiscUtils {
             assert process.exitValue() == 0;
         } catch (AssertionError e) {
             throw new RuntimeException("Command Failed");
-        }
-        finally {
+        } finally {
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
@@ -73,17 +72,18 @@ public class MiscUtils {
         return ret;
     }
 
-    public static void assertInstalled(String version) throws Exception {
-        assertThat(Const.get().getPackagesRootDir().exists()).isTrue();
+    public static void assertInstalled(PackageManager packageManager, String version) throws Exception {
+        assertThat(packageManager.getFs().getPackagesRootDir().exists()).isTrue();
 
-        for (String pythonVersion: Const.get().supportedVersions) {
-            File pythonVersionDir = Const.get().getPackagePythonVersionDir(pythonVersion);
+        for (BaseWheel wheel : packageManager.getWheels()) {
+            assertThat(wheel.getVersion().equals(version));
+            File pythonVersionDir = new File(packageManager.getFs().getPackagesRootDir(), wheel.getDstDirName());
             File packageDir = new File(String.valueOf(pythonVersionDir), Const.get().packageName);
 
             assertThat(packageDir.exists()).isTrue();
             assertThat(pythonVersionDir.exists()).isTrue();
         }
-        Path currentVersionFile = Paths.get(String.valueOf(Const.get().getPackagesRootDir()), "version.txt");
+        Path currentVersionFile = Paths.get(String.valueOf(packageManager.getFs().getPackagesRootDir()), "version.txt");
         Files.readString(currentVersionFile);
     }
 

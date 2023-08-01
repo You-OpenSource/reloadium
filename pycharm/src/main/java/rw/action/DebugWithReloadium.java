@@ -8,10 +8,8 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import rw.dialogs.DialogFactory;
-import rw.dialogs.FirstDebugDialog;
-import rw.dialogs.FirstRunDialog;
-import rw.dialogs.TipDialog;
 import rw.icons.Icons;
+import rw.service.Service;
 
 
 public class DebugWithReloadium extends WithReloaderBase implements DumbAware {
@@ -19,7 +17,7 @@ public class DebugWithReloadium extends WithReloaderBase implements DumbAware {
 
     public static String ID = "DebugWithReloadium";
 
-    DebugWithReloadium() {
+    public DebugWithReloadium() {
         super();
         this.runType = RunType.DEBUG;
     }
@@ -28,6 +26,8 @@ public class DebugWithReloadium extends WithReloaderBase implements DumbAware {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = getEventProject(e);
         boolean result = DialogFactory.get().showFirstDebugDialog(project);
+
+        Service.get().onRun();
 
         if (!result) {
             return;
@@ -40,12 +40,13 @@ public class DebugWithReloadium extends WithReloaderBase implements DumbAware {
     void setRunningIcon(AnActionEvent e) {
         e.getPresentation().setIcon(Icons.RestartDebugger);
     }
+
     void setNotRunningIcon(AnActionEvent e) {
         e.getPresentation().setIcon(Icons.Debug);
     }
 
     @Override
-    protected Executor getExecutor() {
+    public Executor getExecutor() {
         return DefaultDebugExecutor.getDebugExecutorInstance();
     }
 }

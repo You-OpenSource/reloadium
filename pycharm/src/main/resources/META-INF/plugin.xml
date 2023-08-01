@@ -1,27 +1,576 @@
-<idea-plugin>
+<idea-plugin xmlns:xi="http://www.w3.org/1999/XSL/Transform">
     <id>org.reloadium</id>
-    <name>Reloadium - Hot Reloading &#38; Profiling for Python</name>
-    <version>0.8.5</version>
-    <idea-version since-build="203"/>
+    <name>Reloadium - ChatGPT, Hot Reloading and Profiling for Python</name>
+    <version>1.2.0</version>
+    <idea-version since-build="223"/>
     <vendor email="damian@reloadware.com" url="reloadium.io">Reloadware</vendor>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
     <depends>com.intellij.modules.platform</depends>
 
     <description><![CDATA[
+        <h3>ChatGPT integration</h3>
+        <div>
+            <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/chatgpt_fix.gif" width="600px" alt="ChatGPT"/>
+        </div>
+
+        <h3>Hot reloading:</h3>
         <div>
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/example_small.gif" width="600px" alt="Hot Reloading"/>
         </div>
+
+        <h3>Profiling</h3>
         <div>
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/profiling.gif" width="600px" alt="Profiling"/>
         </div>
+
         
-         <p>Reloadium adds hot reloading and profiling features to any Python application</p>
+         <p>Reloadium adds hot reloading, profiling and ChatGPT chat to your IDE</p>
         ]]>
     </description>
 
     <change-notes><![CDATA[
     
+        <h3>1.2.0</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Files with breakpoints are reloadable</li>
+                            <li>Processing files progress</li>
+                            <li>Uploading reloadium package to remote interpreters improvements</li>
+                            <li>Current File run configuration support</li>
+                            <li>Only scroll to error if not visible</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Persisting current line indicators</li>
+                            <li>Not switching thread errors</li>
+                            <li>Not updating debugger after frame reload</li>
+                            <li>Function local completion not working in remote development</li>
+                            <li>Syntax errors not clearing</li>
+                        </ul>
+                    
+                </div>
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Ignore special functions like __getattr__, __repr__ from handling exceptions (Unless with a breakpoint)</li>
+                            <li>Exception handling speed improvements</li>
+                            <li>Drop frame improvements</li>
+                            <li>Function mementos when stepping into</li>
+                            <li>Debug logging when RW_DEBUG=True</li>
+                            <li>Frame reloading closures</li>
+                            <li>Handling errors in closures</li>
+                            <li>Profile child frames when stepping</li>
+                            <li>Better asyncio support</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Breakpoint always hit on functions last lines</li>
+                            <li>Not handling errors during stepping when wrapped in try from outside</li>
+                            <li>Jittery stepping into</li>
+                            <li>Not breaking in closures</li>
+                            <li>Closure parent function not restarting</li>
+                            <li>Running with reloadium results in normal run when started too quickly.</li>
+                            <li>Encoding issues</li>
+                            <li>Circular import dependency issues for bigger projects</li>
+                        </ul>
+                    
+                        <b>Removed:</b>
+                        <ul>
+                            <li>Drop frame support for python <= 3.9</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>1.1.1</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>AI:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Add change context button</li>
+                            <li>Resizable code viewer</li>
+                            <li>High contrast mode improvements</li>
+                            <li>Sources to replies in square bracket notation</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Hyperlinks not working in markdown</li>
+                            <li>Code viewer not persisting extensions</li>
+                            <li>Wrong lines for method context</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Set caret position to error location</li>
+                            <li>Dictionary runtime completion improvements</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Jitters when typing</li>
+                            <li>Multiple runtime completion markers in the gutter issues</li>
+                            <li>Runtime completion indicator not working for remote interpreters</li>
+                        </ul>
+                    
+                </div>
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Removed:</b>
+                        <ul>
+                            <li>3.7 support</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Reloading non suspended frames (in debug mode)</li>
+                            <li>Pytest speedups</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Mementos crashing for non async functions in async context</li>
+                            <li>Not profiling when using freezegun</li>
+                            <li>Stripping docstrings in Python 3.11</li>
+                            <li>Infinite recursion issue for big projects</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>1.1.0</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>ChatGPT integration</li>
+                            <li>UI Improvements</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Fix ComparableVersion issues</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>1.0.1</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Python 3.11 support</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Remote interpreters saving issues</li>
+                            <li>Missing () when completing functions</li>
+                            <li>Profiler concurrency issues</li>
+                            <li>Too many whitespaces in completion tail</li>
+                            <li>Apple silicon rosetta support</li>
+                            <li>Completion not working for selected frame in evaluate</li>
+                            <li>Docker compose interpreter not working</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Multiline error rendering</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>1.0.0</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Dropping module frames for M1</li>
+                            <li>Add __doc__ to function calls completion</li>
+                            <li>Runtime completion for evaluate mode</li>
+                            <li>Numpy __doc__ style completion support</li>
+                            <li>FastApi support</li>
+                            <li>Hot reloading docstrings</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Assertion error in fast debug mode when no breakpoints present</li>
+                            <li>Wrong error lines in fast debug mode</li>
+                            <li>Reloading issues when using snoop library</li>
+                            <li>Celery noreload flag issue</li>
+                            <li>Cannot retrieve frame symbol issues</li>
+                            <li>Cannot drop module frame on M1</li>
+                        </ul>
+                    
+                        <b>Removed:</b>
+                        <ul>
+                            <li>Telemetry, sentry opt out</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Completion issues when not suspended</li>
+                            <li>Slow action on EDT issues</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Completion in run mode</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.9.6</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>No reload decorator in function and module frames issues</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Fast debug</li>
+                            <li>Async mementos support</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Always collect memory info option</li>
+                            <li>New UI support</li>
+                            <li>Multithreaded frame errors support </li>
+                            <li>Runtime completion</li>
+                            <li>Remote development automatic package upload</li>
+                            <li>Centering editor on errors</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Frame progress not showing on first slow line</li>
+                            <li>Null pointer exception when dropping frames</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.9.5</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Restarting non top frames</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Not restarting frame on related files changes</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Crashing on None profiler</li>
+                            <li>Error message and highlighter not disappearing</li>
+                            <li>Execution highlighter not disappearing</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Tooltip for profiler preview renderer</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.9.4</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Dropping multiple frames after frame restarting issues</li>
+                            <li>Reloading flask views</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Async generators support</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Jittery frame dropping visualisation</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.9.3</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Error handling preferences issues</li>
+                            <li>M2 Chip issues</li>
+                            <li>Debugger in suspend mode after fixing an error</li>
+                            <li>Marking reloadable frames if non reloadable between</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.9.2</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Handle adding and modifying dataclass class variables</li>
+                            <li>Make RW_DEBUG work in prod</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Flask-sqlalchemy issues</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Error message on missing path mappings</li>
+                            <li>Profiling formatting improvements</li>
+                            <li>Collecting both memory and time information at the same time</li>
+                            <li>Profiling values folding</li>
+                            <li>Profiling color map frame scope</li>
+                            <li>Set as default buttons to quick config page</li>
+                            <li>Profiling cumulate type</li>
+                            <li>Highlighting reloadable frames in the call stack</li>
+                            <li>Add drop frame action (pop, reset frame)</li>
+                            <li>Hot reloading unhandled exceptions without breakpoint</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Profiling sampling issue (blank values for 100ms lines)</li>
+                            <li>Detecting M1 issues</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.9.1</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Changed:</b>
+                        <ul>
+                            <li>Incompatible system message</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>M1 installation compatibility issues</li>
+                            <li>Non ascii paths issues on save</li>
+                            <li>Not cleaning profile information</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.9.0</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Quick config</li>
+                            <li>Memory line profiler</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Detecting rosetta</li>
+                            <li>System PYTHONPATH not persisting issue</li>
+                        </ul>
+                    
+                </div>
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Future imports and docstring issue</li>
+                            <li>Missing docstrings</li>
+                            <li>Non ascii paths issues</li>
+                            <li>Remote interpreter issues in 2022.2.3</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.8.8</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Empty working directory issues</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.8.7</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Fix adding from import items issue</li>
+                            <li>Fix windows multiprocessing bugs</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Easier downgrading</li>
+                        </ul>
+                    
+                        <b>Removed:</b>
+                        <ul>
+                            <li>Package autoupdater</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Confusing RELOADIUMPATH message when no files are watched</li>
+                            <li>Remote interpreter issues for new PyCharm versions</li>
+                            <li>View pane null pointer exception</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
+        <h3>0.8.6</h3>
+            <div style="padding-left: 20px;">
+            
+                <h4>Miscellaneous:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Encoding issues</li>
+                            <li>Import threading issues</li>
+                            <li>Multiprocessing issues</li>
+                            <li>Double popup issue on FrameError</li>
+                        </ul>
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Multiprocessing extension</li>
+                            <li>Manual reload file command</li>
+                            <li>Symlinks and mounted directories support</li>
+                        </ul>
+                    
+                </div>
+                <h4>PyCharm:</h4>
+                <div style="padding-left: 40px;">
+                    
+                        <b>Added:</b>
+                        <ul>
+                            <li>Reloadable files highlighting</li>
+                            <li>Manual reload action</li>
+                        </ul>
+                    
+                        <b>Fixed:</b>
+                        <ul>
+                            <li>Too many open files issue</li>
+                        </ul>
+                    
+                </div>
+            </div>
+        </div>
         <h3>0.8.5</h3>
             <div style="padding-left: 20px;">
             
@@ -581,36 +1130,67 @@
         <errorHandler implementation="rw.audit.ErrorSubmitter"/>
 
         <projectConfigurable
-          parentId="tools"
-          instance="rw.settings.ProjectSettingsConfigurable"
-          id="rw.settings.ProjectSettings"
-          displayName="Reloadium Project Settings"
-          nonDefaultProject="false"/>
+                parentId="tools"
+                instance="rw.settings.ProjectSettingsConfigurable"
+                id="rw.settings.ProjectSettings"
+                displayName="Reloadium Project Settings"
+                nonDefaultProject="false"/>
 
         <projectService
-          serviceImplementation="rw.settings.ProjectSettings"/>
+                serviceImplementation="rw.settings.ProjectSettings"/>
 
         <applicationConfigurable
-          parentId="tools"
-          instance="rw.preferences.PreferencesConfigurable"
-          id="rw.preferences.Preferences"
-          displayName="Reloadium Preferences"/>
-
-         <applicationService
-          serviceImplementation="rw.preferences.Preferences"/>
-
-         <applicationService
-          serviceImplementation="rw.dialogs.DialogsState"
-          />
+                parentId="tools"
+                instance="rw.preferences.PreferencesConfigurable"
+                id="rw.preferences.Preferences"
+                displayName="Reloadium Preferences"/>
 
         <applicationService
-          serviceInterface="rw.service.Service"
-          serviceImplementation="rw.service.Service"
-          testServiceImplementation="rw.service.TestService"
-          />
+                serviceImplementation="rw.preferences.Preferences"/>
+
+        <applicationService
+                serviceImplementation="rw.dialogs.DialogsState"
+        />
+
+        <applicationService
+                serviceInterface="rw.service.Service"
+                serviceImplementation="rw.service.Service"
+        />
+
+        <postStartupActivity implementation="rw.service.Startup"/>
+
+        <fileDocumentManagerListener implementation="rw.action.ReloadOnSave"/>
+        <fileIconPatcher implementation="rw.icons.IconPatcher" order="last"/>
+        <projectViewNodeDecorator implementation="rw.icons.IconDecorator"/>
+
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.LocalCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.GlobalCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.ImportCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.FrameCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.FromImportCompletionContributor"/>
+        <codeInsight.lineMarkerProvider language="Python"
+                                        implementationClass="rw.completion.CompletableFunctionsLineMarker"/>
+        <notificationGroup id="reloadium" displayType="BALLOON"/>
     </extensions>
 
     <actions>
+        <action id="FastDebugWithReloadium"
+                class="rw.action.FastDebugWithReloadium"
+                text="Fast Debug with Reloadium"
+                description="Fast Debug script with hot reloading enabled"
+                icon="rw.icons.Icons.FastDebug"
+        >
+            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>
+            <add-to-group group-id="RunMenu" anchor="first"/>
+            <add-to-group group-id="RunDashboardContentToolbar" anchor="first"/>
+        </action>
+
         <action id="DebugWithReloadium"
                 class="rw.action.DebugWithReloadium"
                 text="Debug with Reloadium"
@@ -618,6 +1198,7 @@
                 icon="rw.icons.Icons.Debug"
         >
             <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>
             <add-to-group group-id="RunMenu" anchor="first"/>
             <add-to-group group-id="RunDashboardContentToolbar" anchor="first"/>
         </action>
@@ -628,11 +1209,20 @@
                 description="Run script with hot reloading enabled"
                 icon="rw.icons.Icons.Run">
             <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>
             <add-to-group group-id="RunMenu" anchor="first"/>
             <add-to-group group-id="RunDashboardContentToolbar" anchor="first"/>
         </action>
 
-        <action id="DebugWithReloadiumRunContextPopup"
+        <action id="FastDebugWithReloadiumRunContextPopup"
+                class="rw.action.FastDebugWithReloadiumRunContext"
+                text="Fast Debug with Reloadium"
+                description="Fast Debug script with hot reloading enabled"
+                icon="rw.icons.Icons.FastDebug">
+            <add-to-group group-id="RunContextGroup" anchor="first"/>
+        </action>
+
+        <action id="DebugWithReloadiumRunContext"
                 class="rw.action.DebugWithReloadiumRunContext"
                 text="Debug with Reloadium"
                 description="Debug script with hot reloading enabled"
@@ -640,7 +1230,7 @@
             <add-to-group group-id="RunContextGroup" anchor="first"/>
         </action>
 
-        <action id="RunWithReloadiumRunContextPopup"
+        <action id="RunWithReloadiumRunContext"
                 class="rw.action.RunWithReloadiumRunContext"
                 text="Run with Reloadium"
                 description="Run script with hot reloading enabled"
@@ -648,16 +1238,20 @@
             <add-to-group group-id="RunContextGroup" anchor="first"/>
         </action>
 
+        <action id="ManualReload"
+                class="rw.action.ManualReload"
+                text="Hot Reload File"
+                description="Hot Reload File"
+                icon="rw.icons.Icons.Update">
+            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunContextGroup" anchor="last"/>
+        </action>
+
         <action id="RerunDebugWithReloadium" class="rw.action.RerunDebugWithReloadium">
             <add-to-group group-id="XDebugger.ToolWindow.LeftToolbar" anchor="first"/>
         </action>
 
         <group id="ReloadiumGroup" text="Reloadium" popup="true">
-            <action id="UpdatePackage"
-                    class="rw.action.Update"
-                    text="Update Reloadium Package"
-                    icon="rw.icons.Icons.Update">
-            </action>
             <action id="ReloadiumProjectSettings"
                     class="rw.action.ProjectSettings"
                     text="Project Settings"
@@ -677,8 +1271,19 @@
         </group>
 
         <action id="Profile" class="rw.profile.ProfileResultToggle" icon="rw.icons.Icons.Timing">
-          <add-to-group group-id="EditorGutterVcsPopupMenu" relative-to-action="Annotate" anchor="after"/>
+            <add-to-group group-id="EditorGutterVcsPopupMenu" relative-to-action="Annotate" anchor="after"/>
+        </action>
+
+        <action id="DropFrame"
+                class="rw.action.DropFrameAction"
+                text="Reset Frame"
+                icon="rw.icons.Icons.DropFrame">
+            <add-to-group group-id="DebuggingActionsGroup"/>
+            <add-to-group group-id="XDebugger.Frames.Tree.Popup" anchor="first"/>
+            <add-to-group group-id="XDebugger.ToolWindow.TopToolbar3.Extra"/>
         </action>
     </actions>
 
+    <xi:include href="ai.xml"/>
+    <xi:include href="depot.xml"/>
 </idea-plugin>

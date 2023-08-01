@@ -21,6 +21,9 @@
         <img src="media/profiling.gif" width="750px" alt="Profiling">
     </p>
 
+**Examples above are run in debug mode with added breakpoint.**
+
+
 
 
 
@@ -42,11 +45,11 @@ Details
 .. image:: https://img.shields.io/jetbrains/plugin/r/stars/18509-reloadium
     :target: https://plugins.jetbrains.com/plugin/18509-reloadium
 
-| Reloadium adds hot reloading and profiling features to any Python application
 
-Sponsors
-#######
-Thanks `www.you.com <https://www.you.com/?utm_source=opensource&utm_medium=GitHub&utm_campaign=reloadium>`_ for the M1 Mini donation
+
+
+| Reloadium adds hot reloading, profiling and ChatGPT chat to your IDE
+
 
 Installing
 ##########
@@ -81,28 +84,36 @@ Running modules:
 | To apply your changes simply save a file
 
 
+AI
+######
+
+| Reloadium integrates with ChatGpt seamlessly providing additional context to your conversations resulting in much better replies.
+
+.. image:: media/chatgpt_fix.gif
+    :width: 700
+    :alt: ChatGpt
+
+
 General Python Features
 #######################
 
-| Reloadium will rerun current function when changed.
-| Developers get instant feedback whether the code is working or not.
+| When altered, Reloadium will execute the current function again, providing developers with immediate feedback on the functionality of their code.
 
-.. figure:: media/frame_reloading.gif
+.. image:: media/frame_reloading.gif
     :width: 700
     :alt: Frame Reloading
 
 
-| Reloadium will handle errors during reloading function and let you fix mistakes.
+| Reloadium manages errors that occur while reloading functions, allowing you to correct any mistakes seamlessly.
 
-.. figure:: media/fixing_errors.gif
+.. image:: media/fixing_errors.gif
     :width: 700
     :alt: Frame Reloading
 
 
-| Reloadium is capable of reloading files across the whole project.
-| Tweaking with settings could not be easier.
+| Reloadium has the ability to refresh files throughout the entire project by tracking dependencies.
 
-.. figure:: media/multi_file_reloading.gif
+.. image:: media/multi_file_reloading.gif
     :width: 700
     :alt: Frame Reloading
 
@@ -110,16 +121,16 @@ General Python Features
 Django
 ######
 
-| Reloadium will hot reload views and refresh page on save.
+| Upon saving, Reloadium performs hot reloading of views and automatically refreshes the page.
 
-.. figure:: media/django_page_refreshing.gif
+.. image:: media/django_page_refreshing.gif
     :width: 700
     :alt: Page Refreshing
 
 
-| Reloadium will rollback database changes to prevent creating unwanted objects after reloading current function.
+| To avoid generating undesired objects after reloading the current function, Reloadium reverts any database modifications.
 
-.. figure:: media/django_rolling_back.gif
+.. image:: media/django_rolling_back.gif
     :width: 700
     :alt: Rolling back db
 
@@ -127,10 +138,10 @@ Django
 Flask
 #####
 
-| Reloadium will hot reload flask apps and refresh page on save.
-| Changing content can be seen in real time making web development much smoother.
+| Reloadium hot reloads Flask apps and automatically refreshes the page upon saving. 
+| This enables real-time content updates, significantly streamlining web development.
 
-.. figure:: media/flask.gif
+.. image:: media/flask.gif
     :width: 700
     :alt: Flask
 
@@ -141,7 +152,7 @@ SqlAlchemy
 
 | Reloadium will rollback database changes to prevent creating unwanted objects after reloading current function.
 
-.. figure:: media/sqlalchemy.gif
+.. image:: media/sqlalchemy.gif
     :width: 700
     :alt: SqlAlchemy
 
@@ -149,9 +160,8 @@ SqlAlchemy
 Pandas
 ##########
 
-| Reloadium hot reloads pandas objects.
-| Manipulating complex dataframes for data science could not be easier.
+| Reloadium facilitates hot reloading of Pandas objects, making the manipulation of intricate dataframes for data science remarkably simple.
 
-.. figure:: media/pandas.gif
+.. image:: media/pandas.gif
     :width: 700
     :alt: Pandas

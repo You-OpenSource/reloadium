@@ -1,30 +1,31 @@
 package rw.tests.fixtures;
 
-import rw.consts.Const;
+import rw.pkg.PackageManager;
+import rw.pkg.wheel.BaseWheel;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class PackageFixture {
     public File currentVersionFile;
-    public File packageDir;
-    public File packageDistInfoDir;
+    public Map<String, File> pythonVersionToPackageDirs;
 
-    public PackageFixture(String version) throws Exception {
-        this.currentVersionFile = new File(String.valueOf(Const.get().getPackagesRootDir()), "version.txt");
+    public PackageFixture(PackageManager packageManager, String version) throws Exception {
+        this.currentVersionFile = new File(String.valueOf(packageManager.getFs().getPackagesRootDir()), "version.txt");
 
-        for (String v : Const.singleton.supportedVersions) {
-            this.packageDir = new File(Const.get().getPackagePythonVersionDir(v).toString(), Const.get().packageName);
-            this.packageDistInfoDir = new File(Const.get().getPackagePythonVersionDir(v).toString(),
-                    String.format("%s-%s.dist-info", Const.get().packageName, version));
+        this.pythonVersionToPackageDirs = new HashMap<>();
 
-            packageDir.mkdirs();
-            packageDistInfoDir.mkdirs();
-
-            currentVersionFile.toPath().getParent().toFile().mkdir();
-            currentVersionFile.createNewFile();
+        for (BaseWheel wheel : packageManager.getWheels()) {
+            File pythonVersionDir = new File(packageManager.getFs().getPackagesRootDir(), wheel.getDstDirName());
+            pythonVersionDir.mkdirs();
+            this.pythonVersionToPackageDirs.put(wheel.getVersion(), pythonVersionDir);
         }
-        Files.writeString(currentVersionFile.toPath(), version);
+
+        this.currentVersionFile.toPath().getParent().toFile().mkdir();
+        this.currentVersionFile.createNewFile();
+        Files.writeString(this.currentVersionFile.toPath(), version);
     }
 }

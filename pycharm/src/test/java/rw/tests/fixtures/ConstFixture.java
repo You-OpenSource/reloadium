@@ -3,12 +3,7 @@ package rw.tests.fixtures;
 import rw.consts.Const;
 import rw.consts.Stage;
 
-import java.io.File;
-import java.nio.file.Files;
-
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
-import org.mockito.Mockito;
 
 
 public class ConstFixture {
@@ -24,16 +19,12 @@ public class ConstFixture {
         this.device = spy(new Const());
         Const.singleton = this.device;
 
-        File dotDir = new File(Files.createTempDirectory(".reloadium").toFile().getAbsolutePath());
-
-        Mockito.lenient().doReturn(dotDir).when(this.device).getDotDir();
-
         if (this.makeProd) {
             this.device.stage = Stage.PROD;
         }
     }
 
-    public void stop() throws Exception {
+    public void tearDown() throws Exception {
     }
 }
 

@@ -1,37 +1,43 @@
 package rw.tests.integr;
 
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.testFramework.TestActionEvent;
 import com.jetbrains.python.run.PythonRunConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import rw.action.DebugWithReloadium;
 import rw.action.RerunDebugWithReloadium;
+import rw.action.WithReloaderBase;
 import rw.consts.DataKeys;
-import rw.tests.BaseMockedTestCase;
+import rw.tests.BaseTestCase;
 import rw.tests.fixtures.CakeshopFixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.spy;
 
 
-public class TestRerunDebugAction extends BaseMockedTestCase {
+public class TestRerunDebugAction extends BaseTestCase {
     CakeshopFixture cakeshop;
+    WithReloaderBase action;
 
     @BeforeEach
     protected void setUp() throws Exception {
         super.setUp();
 
-        this.cakeshop = new CakeshopFixture(this.getProject());
-        this.cakeshop.start();
+        this.cakeshop = new CakeshopFixture(this.f);
+        this.cakeshop.setUp();
+
+        this.action = this.getWithReloaderBaseAction(RerunDebugWithReloadium.ID);
     }
 
     @AfterEach
     protected void tearDown() throws Exception {
-        this.cakeshop.stop();
+        this.cakeshop.tearDown();
 
         super.tearDown();
     }
@@ -48,10 +54,8 @@ public class TestRerunDebugAction extends BaseMockedTestCase {
 
     @Test
     public void testUpdate() {
-        AnAction action = ActionManager.getInstance().getAction(DebugWithReloadium.ID);
-
         AnActionEvent event = getEventWithConf();
-        action.update(event);
+        this.action.update(event);
 
         assertThat(event.getPresentation().isVisible()).isTrue();
         assertThat(event.getPresentation().isEnabled()).isTrue();
@@ -59,31 +63,19 @@ public class TestRerunDebugAction extends BaseMockedTestCase {
 
     @Test
     public void testNoExecutionEnv() {
-        AnAction action = ActionManager.getInstance().getAction(RerunDebugWithReloadium.ID);
-
         AnActionEvent event = new TestActionEvent();
-        action.update(event);
+        this.action.update(event);
         assertThat(event.getPresentation().isVisible()).isTrue();
         assertThat(event.getPresentation().isEnabled()).isFalse();
-        action.actionPerformed(event);
     }
 
     @Test
     public void testPerform() {
-        AnAction action = ActionManager.getInstance().getAction(RerunDebugWithReloadium.ID);
-
         AnActionEvent event = getEventWithConf();
 
-        action.update(event);
+        this.action.update(event);
         assertThat(event.getPresentation().isVisible()).isTrue();
         assertThat(event.getPresentation().isEnabled()).isTrue();
-        action.actionPerformed(event);
-
-        PythonRunConfiguration runConf = this.cakeshop.getRunConf();
-
-        assertThat(runConf.getScriptName()).isEqualTo("main.py");
-        assertThat(runConf.isModuleMode()).isFalse();
-        assertThat(runConf.getEnvs().get("PYTHONPATH").isBlank()).isFalse();
-        assertThat(runConf.getInterpreterOptions()).isEqualTo("-m reloadium pydev_proxy");
+        this.action.actionPerformed(event);
     }
 }

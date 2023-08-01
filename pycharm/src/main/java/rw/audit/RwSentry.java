@@ -1,12 +1,13 @@
 package rw.audit;
 
+import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.application.ApplicationManager;
 import io.sentry.Sentry;
 import io.sentry.SentryEvent;
 import io.sentry.SentryLevel;
 import io.sentry.protocol.Message;
 import io.sentry.protocol.User;
 import org.jetbrains.annotations.VisibleForTesting;
-import rw.config.Config;
 import rw.config.ConfigManager;
 import rw.consts.Const;
 import rw.consts.Stage;
@@ -55,7 +56,11 @@ public class RwSentry {
         this.disable();
     }
 
-    public void captureException(Throwable throwable) {
+    public void captureException(Throwable throwable, boolean fail) {
+        if (ApplicationManager.getApplication().isUnitTestMode()) {
+            throw new RuntimeException(throwable);
+        }
+
         if (Arrays.asList(Stage.LOCAL, Stage.CI).contains(Const.get().stage)) {
             throwable.printStackTrace();
         }
@@ -69,6 +74,10 @@ public class RwSentry {
         Sentry.captureEvent(event);
 
         this.disable();
+
+        if (fail) {
+            throw new RuntimeException(throwable);
+        }
     }
 
     public void submitException(Throwable throwable) {
@@ -94,5 +103,8 @@ public class RwSentry {
 
         event.setUser(user);
         event.setRelease(Const.get().version);
+
+        String ideName = ApplicationInfo.getInstance().getFullApplicationName();
+        event.setTag("IDE", ideName);
     }
 }

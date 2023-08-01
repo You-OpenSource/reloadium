@@ -1,35 +1,26 @@
 package rw.profile;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.project.Project;
 import rw.highlights.Blink;
 import rw.highlights.Blinker;
-import rw.preferences.Preferences;
-import rw.preferences.PreferencesState;
-import rw.session.LineProfile;
-import rw.session.StackUpdate;
-import rw.stack.Stack;
 import rw.highlights.Highlighter;
+import rw.session.events.LineProfile;
 
 import java.awt.*;
-import java.io.File;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class FrameProgressRenderer {
     private static final Logger LOGGER = Logger.getInstance(FrameProgressRenderer.class);
-    private Highlighter highlighter;  // file to current line highlighter
-
     Project project;
-
     Color FRAME_PROGRESS_COLOR = new Color(0, 149, 255, 50);
     Color CURR_LINE_COLOR = new Color(0, 149, 255, 80);
     int BLINK_DURATION = 300;
+    private Highlighter highlighter;  // file to current line highlighter
 
     public FrameProgressRenderer(Project project) {
         this.project = project;
@@ -41,42 +32,43 @@ public class FrameProgressRenderer {
 
     public void renderFrameProgress(LineProfile event) {
         if (this.highlighter != null) {
-            highlighter.hide();
+            ApplicationManager.getApplication().invokeLater(this.highlighter::hide);
         }
-
-        int start = Collections.min(event.getTiming().keySet());
 
         if (!event.isStop()) {
             this.highlighter = new Highlighter(project,
-                            event.getLocalPath(),
-                            event.getLine(),
-                            this.CURR_LINE_COLOR,
-                            -1,
-                            false);
-            this.highlighter.show();
+                    event.getFile(),
+                    event.getLine(),
+                    this.CURR_LINE_COLOR,
+                    -1,
+                    false);
+            ApplicationManager.getApplication().invokeLater(this.highlighter::show);
         }
 
         LOGGER.info("Rendering frame progress");
 
-        PreferencesState state = Preferences.getInstance().getState();
-
-        Blink blink = new Blink(project, event.getLocalPath(), start, event.getLine(), FRAME_PROGRESS_COLOR, -1,
-                this.BLINK_DURATION);
-        Blinker.get().blink(blink);
+        if (!event.getTimeValues().isEmpty()) {
+            Set<Integer> lines = new HashSet<>(event.getTimeValues().keySet());
+            lines.add(event.getLine());
+            int start = Collections.min(lines);
+            int end = Collections.max(lines);
+            Blink blink = new Blink(project, event.getFile(), start, end, FRAME_PROGRESS_COLOR, -1,
+                    this.BLINK_DURATION);
+            Blinker.get().blink(blink);
+        }
     }
-
 
     public void activate() {
         if (this.highlighter == null) {
             return;
         }
-        this.highlighter.show();
+        ApplicationManager.getApplication().invokeLater(this.highlighter::show);
     }
 
     public void deactivate() {
         if (this.highlighter == null) {
             return;
         }
-        this.highlighter.hide();
+        ApplicationManager.getApplication().invokeLater(this.highlighter::hide);
     }
 }

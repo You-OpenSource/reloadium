@@ -9,6 +9,7 @@ import rw.icons.Icons;
 
 public class RunWithReloadiumRunContext extends ContextPopupAction {
     private static final Logger LOGGER = Logger.getInstance(RunWithReloadiumRunContext.class);
+    public static String ID = "RunWithReloadiumRunContext";
 
     RunWithReloadiumRunContext() {
         super();
@@ -18,11 +19,12 @@ public class RunWithReloadiumRunContext extends ContextPopupAction {
     void setRunningIcon(AnActionEvent e) {
         e.getPresentation().setIcon(Icons.Run);
     }
+
     void setNotRunningIcon(AnActionEvent e) {
         e.getPresentation().setIcon(Icons.Run);
     }
 
-    protected Executor getExecutor() {
+    public Executor getExecutor() {
         return DefaultRunExecutor.getRunExecutorInstance();
     }
 }

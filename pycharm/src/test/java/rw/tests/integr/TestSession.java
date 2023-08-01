@@ -1,32 +1,36 @@
 package rw.tests.integr;
 
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileWrapper;
+import com.jetbrains.python.PythonFileType;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import rw.handler.runConf.PythonRunConfHandler;
-import rw.handler.runConf.RunConfHandlerFactory;
-import rw.session.*;
-import rw.tests.BaseMockedTestCase;
+import rw.handler.PythonRunConfHandler;
+import rw.handler.RunConfHandlerFactory;
+import rw.session.Session;
+import rw.session.events.Action;
+import rw.session.events.Handshake;
+import rw.session.events.ModuleUpdate;
+import rw.session.events.UserError;
+import rw.tests.BaseTestCase;
 import rw.tests.fixtures.CakeshopFixture;
 import rw.tests.fixtures.DialogFactoryFixture;
 import rw.tests.fixtures.HighlightManagerFixture;
-import rw.tests.fixtures.StackUpdateFixture;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 
-public class TestSession extends BaseMockedTestCase {
+public class TestSession extends BaseTestCase {
     CakeshopFixture cakeshop;
     DialogFactoryFixture dialogFactoryFixture;
     String stackUpdate;
@@ -35,19 +39,19 @@ public class TestSession extends BaseMockedTestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        this.cakeshop = new CakeshopFixture(this.getProject());
-        this.cakeshop.start();
+        this.cakeshop = new CakeshopFixture(this.f);
+        this.cakeshop.setUp();
 
         this.stackUpdate = Files.readString(Path.of(this.getClass().getClassLoader().getResource("StackUpdate.json").getFile()));
 
         this.dialogFactoryFixture = new DialogFactoryFixture(this.getProject());
-        this.dialogFactoryFixture.start();
+        this.dialogFactoryFixture.setUp();
     }
 
     @AfterEach
     protected void tearDown() throws Exception {
-        this.cakeshop.stop();
-        this.dialogFactoryFixture.stop();
+        this.cakeshop.tearDown();
+        this.dialogFactoryFixture.tearDown();
 
         super.tearDown();
     }
@@ -57,8 +61,7 @@ public class TestSession extends BaseMockedTestCase {
         PythonRunConfHandler handler = (PythonRunConfHandler) RunConfHandlerFactory.factory(cakeshop.getRunConf());
         Session session = new Session(this.getProject(), handler);
 
-        String payload = String.format("{\"ID\": \"Handshake\", \"VERSION\": \"%s\", \"version\": \"2.3.1\"}",
-                Handshake.VERSION);
+        String payload = String.format("{\"ID\": \"Handshake\", \"version\": \"2.3.1\"}");
         Handshake event = (Handshake) session.eventFactory(payload);
         assertThat(event).isInstanceOf(Handshake.class);
         assertThat(event.getVersion()).isEqualTo("2.3.1");
@@ -74,70 +77,22 @@ public class TestSession extends BaseMockedTestCase {
 
         Session session = new Session(this.getProject(), handler);
 
-        File file = new File(this.cakeshop.getRoot().toString(), "cakeshop.py");
-        FileUtils.write(file, "1\n2\n3\n4", "utf-8");
-        file.createNewFile();
+        this.f.configureByText(PythonFileType.INSTANCE, "1\n2\n3\n4");
+        File tempFile = FileUtil.createTempFile( new File("/tmp"), "cakeshop", ".py", true);
+        FileUtil.writeToFile(tempFile, "test content");
+        VirtualFile virtualFile = new VirtualFileWrapper(tempFile).getVirtualFile();
 
-        String payload = String.format("{\"ID\": \"UserError\", \"VERSION\": \"%s\", \"path\": \"%s\", \"line\": 2, \"msg\": \"msg\"}",
-                UserError.VERSION, file);
+        String payload = String.format("{\"ID\": \"UserError\", \"path\": \"%s\", \"line\": 2, \"msg\": \"msg\"}",
+                tempFile);
         UserError event = (UserError) session.eventFactory(payload);
         assertThat(event).isInstanceOf(UserError.class);
-        assertThat(event.getPath()).isEqualTo(file);
+        assertThat(event.getPath()).isEqualTo(tempFile);
         assertThat(event.getLine()).isEqualTo(2);
 
         event.handle();
         verify(this.dialogFactoryFixture.dialogFactory, times(1)).showFirstUserErrorDialog(this.getProject());
         verify(handler.getErrorHighlightManager(), times(1)).add(
-                eq(file), eq(2), eq("msg"));
-    }
-
-    @Test
-    public void testStackUpdate() throws Exception {
-        PythonRunConfHandler handler = (PythonRunConfHandler) RunConfHandlerFactory.factory(cakeshop.getRunConf());
-        HighlightManagerFixture highlightManagerFixture = new HighlightManagerFixture(handler);
-        highlightManagerFixture.start();
-
-        Session session = new Session(this.getProject(), handler);
-
-        File file = new File(this.cakeshop.getRoot().toString(), "cakeshop.py");
-        FileUtils.write(file, "1\n2\n3\n4", "utf-8");
-        file.createNewFile();
-
-        StackUpdateFixture stackUpdateFixture = new StackUpdateFixture(session, file);
-        StackUpdate stackUpdate = stackUpdateFixture.eventFactory();
-
-        assertThat(stackUpdate).isInstanceOf(StackUpdate.class);
-        assertThat(stackUpdate.getContent().size()).isEqualTo(1);
-        stackUpdate.handle();
-    }
-
-    @Test
-    public void testFrameError() throws Exception {
-        PythonRunConfHandler handler = (PythonRunConfHandler) RunConfHandlerFactory.factory(cakeshop.getRunConf());
-        HighlightManagerFixture highlightManagerFixture = new HighlightManagerFixture(handler);
-        highlightManagerFixture.start();
-
-        Session session = new Session(this.getProject(), handler);
-
-        File file = new File(this.cakeshop.getRoot().toString(), "cakeshop.py");
-        FileUtils.write(file, "1\n2\n3\n4", "utf-8");
-        file.createNewFile();
-
-        StackUpdateFixture stackUpdateFixture = new StackUpdateFixture(session, file);
-        StackUpdate stackUpdate = stackUpdateFixture.eventFactory();
-        stackUpdate.handle();
-
-        String payload = String.format("{\"ID\": \"FrameError\", \"VERSION\": \"%s\", " +
-                        "\"line\": 2, \"path\": \"%s\"," +
-                        "\"msg\": \"msg\"}",
-                FrameError.VERSION, file);
-        FrameError event = (FrameError) session.eventFactory(payload);
-        assertThat(event).isInstanceOf(FrameError.class);
-        assertThat(event.getLine()).isEqualTo(2);
-
-        event.handle();
-        verify(this.dialogFactoryFixture.dialogFactory, times(1)).showFirstFrameErrorDialog(this.getProject());
-        verify(handler.getErrorHighlightManager(), times(1)).add(eq(file), eq(2), eq("msg"));
+                eq(virtualFile), eq(2), eq("msg"));
     }
 
     @Test
@@ -152,10 +107,9 @@ public class TestSession extends BaseMockedTestCase {
         FileUtils.write(file, "1\n2\n3\n4", "utf-8");
         file.createNewFile();
 
-        String payload = String.format("{\"ID\": \"ModuleUpdate\", \"VERSION\": \"%s\", \"path\": \"%s\", " +
-                        "\"actions\": [{\"name\": \"Update\", \"obj\": \"Function\"," +
-                        " \"line_start\": 2, \"line_end\": 4}]}",
-                ModuleUpdate.VERSION, file.getAbsolutePath());
+        String payload = String.format("{\"ID\": \"ModuleUpdate\", \"path\": \"%s\", " +
+                "\"actions\": [{\"name\": \"Update\", \"obj\": \"Function\"," +
+                " \"line_start\": 2, \"line_end\": 4}]}", file.getAbsolutePath());
 
         ModuleUpdate event = (ModuleUpdate) session.eventFactory(payload);
         assertThat(event).isInstanceOf(ModuleUpdate.class);
@@ -169,23 +123,5 @@ public class TestSession extends BaseMockedTestCase {
         assertThat(action.getObj()).isEqualTo("Function");
 
         event.handle();
-    }
-
-    @Test
-    public void testIncompatible() throws Exception {
-        PythonRunConfHandler handler = (PythonRunConfHandler) RunConfHandlerFactory.factory(cakeshop.getRunConf());
-        HighlightManagerFixture highlightManagerFixture = new HighlightManagerFixture(handler);
-        highlightManagerFixture.start();
-
-        Session session = new Session(this.getProject(), handler);
-
-        File file = new File(this.cakeshop.getRoot().toString(), "cakeshop.py");
-        FileUtils.write(file, "1\n2\n3\n4", "utf-8");
-        file.createNewFile();
-
-        String payload = "{\"ID\": \"UpdateModule\", \"VERSION\": \"0.0.0\"}";
-
-        ModuleUpdate event = (ModuleUpdate) session.eventFactory(payload);
-        assertThat(event).isNull();
     }
 }

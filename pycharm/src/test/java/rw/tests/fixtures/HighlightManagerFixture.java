@@ -1,17 +1,14 @@
 package rw.tests.fixtures;
 
-import com.intellij.openapi.project.Project;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.highlights.ErrorHighlightManager;
+import rw.handler.RunConfHandler;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.spy;
 
 
 public class HighlightManagerFixture {
-    public ErrorHighlightManager errorHighlightManager;
+    RunConfHandler handler;
 
-    BaseRunConfHandler handler;
-    public HighlightManagerFixture(BaseRunConfHandler handler) throws Exception {
+    public HighlightManagerFixture(RunConfHandler handler) throws Exception {
         this.handler = handler;
     }
 

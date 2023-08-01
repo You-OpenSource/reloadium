@@ -2,81 +2,67 @@ package rw.session;
 
 import com.google.gson.Gson;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
+import org.jetbrains.concurrency.Promise;
+import org.jetbrains.concurrency.Promises;
 import rw.audit.RwSentry;
-import rw.handler.runConf.BaseRunConfHandler;
+import rw.handler.RunConfHandler;
+import rw.session.cmds.Cmd;
+import rw.session.cmds.completion.*;
+import rw.session.events.*;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.entry;
 
 class RawEvent {
     public String ID;
-    public String VERSION;
 }
 
-public class Session extends Thread {
-    private static final Logger LOGGER = Logger.getInstance(Session.class);
-
-    private final Project project;
-
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
+class Client extends Thread {
+    private static final Logger LOGGER = Logger.getInstance(Client.class);
+    ServerSocket server;
+    Session session;
+    @Nullable
+    Cmd.Return cmdReturn;
+    @Nullable
+    String cmdReturnId;
+    private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private Integer port = null;
-    private final BaseRunConfHandler handler;
-    private Map<String, Class<? extends Event>> events;
-    private Map<String, String> eventVersions;
 
-    public Session(Project project, BaseRunConfHandler handler) {
-        this.project = project;
-        this.handler = handler;
+    Client(ServerSocket server, Session session) {
+        this.session = session;
+        this.server = server;
+        this.cmdReturn = null;
+        this.cmdReturnId = null;
+    }
 
-        this.events = Map.ofEntries(
-                entry(Handshake.ID, Handshake.class),
-                entry(ModuleUpdate.ID, ModuleUpdate.class),
-                entry(FrameError.ID, FrameError.class),
-                entry(LineProfile.ID, LineProfile.class),
-                entry(StackUpdate.ID, StackUpdate.class),
-                entry(UserError.ID, UserError.class),
-                entry(ClearErrors.ID, ClearErrors.class),
-                entry(LineProfileClear.ID, LineProfileClear.class)
-        );
-
-        this.eventVersions = Map.ofEntries(
-                entry(Handshake.ID, Handshake.VERSION),
-                entry(ModuleUpdate.ID, ModuleUpdate.VERSION),
-                entry(FrameError.ID, FrameError.VERSION),
-                entry(LineProfile.ID, LineProfile.VERSION),
-                entry(UserError.ID, UserError.VERSION),
-                entry(StackUpdate.ID, StackUpdate.VERSION),
-                entry(ClearErrors.ID, ClearErrors.VERSION),
-                entry(LineProfileClear.ID, LineProfileClear.VERSION)
-        );
-
+    public boolean connect() {
         try {
-            this.serverSocket = new ServerSocket(0);
-            this.port = this.serverSocket.getLocalPort();
+            this.socket = this.server.accept();
+            LOGGER.info("Client connected to the Session");
         } catch (IOException ignored) {
+            return false;
         }
+        return true;
     }
 
     public void run() {
-        if (this.serverSocket == null) {
-            return;
-        }
-
         try {
-            this.clientSocket = this.serverSocket.accept();
-            this.out = new PrintWriter(this.clientSocket.getOutputStream(), true);
-            this.in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+            this.out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
+            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
+
             String inputLine;
             try {
                 while ((inputLine = this.in.readLine()) != null) {
@@ -84,27 +70,127 @@ public class Session extends Thread {
                 }
             } catch (SocketException e) {
                 if (!e.getMessage().equals("Connection reset")) {
-                    RwSentry.get().captureException(e);
+                    RwSentry.get().captureException(e, false);
                 }
             }
         } catch (IOException e) {
-            RwSentry.get().captureException(e);
+            RwSentry.get().captureException(e, false);
         }
-    }
-
-    public int getPort() {
-        return this.port;
     }
 
     private void ingestLine(String line) {
         try {
-            Event event = this.eventFactory(line);
+            if (this.cmdReturnId != null) {
+                this.cmdReturn = this.session.returnFactory(line, this.cmdReturnId);
+
+                if (this.cmdReturn == null) {
+                    this.cmdReturn = new Cmd.Return();
+                }
+            }
+
+            Event event = this.session.eventFactory(line);
             if (event == null) {
                 return;
             }
             event.handle();
         } catch (RuntimeException e) {
-            RwSentry.get().captureException(e);
+            RwSentry.get().captureException(e, false);
+        }
+    }
+
+    @Nullable Cmd.Return send(Cmd cmd) {
+        this.cmdReturn = null;
+        this.cmdReturnId = cmd.getId();
+
+        Gson gson = new Gson();
+        String payload = gson.toJson(cmd);
+        LOGGER.info(String.format("Sending cmd %s", cmd.getId()));
+        this.out.println(payload);
+
+        int timeout = 4000;
+
+        while (this.cmdReturn == null && timeout >= 0) {
+            try {
+                sleep(100);
+                ProgressManager.checkCanceled();
+            } catch (InterruptedException e) {
+                RwSentry.get().captureException(e, false);
+            }
+            timeout -= 100;
+        }
+
+        if (timeout <= 0) {
+            LOGGER.info(String.format("Timeout waiting for \"%s\" return", this.cmdReturnId));
+        }
+
+        this.cmdReturnId = null;
+
+        return this.cmdReturn;
+    }
+
+    public void close() {
+        try {
+            if (this.in != null) {
+                this.in.close();
+            }
+            if (this.out != null) {
+                this.out.close();
+            }
+            if (this.socket != null) {
+                this.socket.close();
+            }
+        } catch (Exception e) {
+            RwSentry.get().captureException(e, false);
+        }
+    }
+}
+
+public class Session extends Thread {
+    private static final Logger LOGGER = Logger.getInstance(Session.class);
+
+    private final Project project;
+    private final RunConfHandler handler;
+    private ServerSocket serverSocket;
+    private Integer port = null;
+    private Map<String, Class<? extends Event>> events;
+    private Map<String, Class<? extends Cmd.Return>> returns;
+    private List<Client> clients;
+
+    public Session(Project project, RunConfHandler handler) {
+        this.project = project;
+        this.handler = handler;
+        this.clients = new ArrayList<>();
+
+        this.events = Map.ofEntries(
+                entry(Handshake.ID, Handshake.class),
+                entry(ModuleUpdate.ID, ModuleUpdate.class),
+                entry(ThreadErrorEvent.ID, ThreadErrorEvent.class),
+                entry(LineProfile.ID, LineProfile.class),
+                entry(StackUpdate.ID, StackUpdate.class),
+                entry(UserError.ID, UserError.class),
+                entry(ClearErrors.ID, ClearErrors.class),
+                entry(LineProfileClear.ID, LineProfileClear.class),
+                entry(WatchingPaths.ID, WatchingPaths.class),
+                entry(FrameDropped.ID, FrameDropped.class),
+                entry(UpdateDebugger.ID, UpdateDebugger.class),
+                entry(ClearThreadError.ID, ClearThreadError.class),
+                entry(FunctionTraced.ID, FunctionTraced.class),
+                entry(WatchingConcluded.ID, WatchingConcluded.class),
+                entry(ShowDialog.ID, ShowDialog.class)
+        );
+
+        this.returns = Map.ofEntries(
+                entry("GetLocalCompletion", GetLocalCompletion.Return.class),
+                entry("GetFrameCompletion", GetFrameCompletion.Return.class),
+                entry("GetGlobalCompletion", GetGlobalCompletion.Return.class),
+                entry("GetImportCompletion", GetImportCompletion.Return.class),
+                entry("GetFromImportCompletion", GetFromImportCompletion.Return.class)
+        );
+
+        try {
+            this.serverSocket = new ServerSocket(0);
+            this.port = this.serverSocket.getLocalPort();
+        } catch (IOException ignored) {
         }
     }
 
@@ -118,38 +204,84 @@ public class Session extends Thread {
 
         Class<? extends Event> eventClass = this.events.get(event.ID);
         if (eventClass == null) {
-            LOGGER.warn("Unknown event " + event.ID);
             return null;
         }
-        String expectedVersion = this.eventVersions.get(event.ID);
 
-        if (!expectedVersion.equals(event.VERSION)) {
-            LOGGER.warn(String.format("Incompatible event versions for event type \"%s\" (expected=%s, got=%s)",
-                    event.ID, expectedVersion, event.VERSION));
-            return null;
-        }
         ret = g.fromJson(payload, eventClass);
         ret.setHandler(this.handler);
+        if(!ret.prepare()) {
+            return null;
+        }
 
         return ret;
     }
 
+    @VisibleForTesting
+    @Nullable
+    public Cmd.Return returnFactory(String payload, String cmdId) {
+        Gson g = new Gson();
+
+        Class<? extends Cmd.Return> returnClass = this.returns.get(cmdId);
+        if (returnClass == null) {
+            return null;
+        }
+
+        Cmd.Return ret;
+
+        ret = g.fromJson(payload, returnClass);
+        return ret;
+    }
+
+    public void run() {
+        if (this.serverSocket == null) {
+            return;
+        }
+
+        while (true) {
+            Client client = new Client(this.serverSocket, this);
+            if (!client.connect()) {
+                return;
+            }
+            client.start();
+            this.clients.add(client);
+        }
+    }
+
+    public @Nullable Cmd.Return send(Cmd cmd) {
+        Cmd.Return ret = null;
+
+        List<Client> clients = new ArrayList<>(this.clients);
+
+        for (Client c : clients) {
+            ret = c.send(cmd);
+        }
+
+        return ret;
+    }
+
+    public Promise<Cmd.Return> sendAsync(Cmd cmd) {
+        return Promises.runAsync(() -> send(cmd));
+    }
+
+    public RunConfHandler getHandler() {
+        return handler;
+    }
+
+    public int getPort() {
+        return this.port;
+    }
+
     public void close() {
         try {
-            if (this.in != null) {
-                this.in.close();
-            }
-            if (this.out != null) {
-                this.out.close();
-            }
-            if (this.clientSocket != null) {
-                this.clientSocket.close();
-            }
-            if (this.clientSocket != null) {
+            if (this.serverSocket != null) {
                 this.serverSocket.close();
             }
         } catch (Exception e) {
-            RwSentry.get().captureException(e);
+            RwSentry.get().captureException(e, false);
+        }
+
+        for (Client c : this.clients) {
+            c.close();
         }
     }
 }

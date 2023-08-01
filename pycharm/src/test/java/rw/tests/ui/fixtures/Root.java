@@ -10,7 +10,6 @@ import rw.tests.utils.MiscUtils;
 import java.time.Duration;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
-import static com.intellij.remoterobot.utils.RepeatUtilsKt.waitFor;
 import static java.time.Duration.ofSeconds;
 
 @FixtureName(name = "Root")
@@ -52,21 +51,6 @@ public class Root extends IdeaFrame {
         this.find(ComponentFixture.class,
                 byXpath(String.format("//div[@accessiblename='%s']", Const.get().msgs.INSTALLING_FAILED)),
                 Duration.ofSeconds(60));
-    }
-
-    public void assertButtonsEnabled() {
-        MiscUtils.sleep(5.0f);
-
-        ActionButtonFixture runWithReloadium = this.runWithReloadium();
-        ActionButtonFixture debugWithReloadium = this.debugWithReloadium();
-
-        waitFor(ofSeconds(60), runWithReloadium::isEnabled);
-        waitFor(ofSeconds(60), debugWithReloadium::isEnabled);
-
-        MiscUtils.sleep(15.0f);
-
-        waitFor(ofSeconds(60), runWithReloadium::isEnabled);
-        waitFor(ofSeconds(60), debugWithReloadium::isEnabled);
     }
 
     public void assertButtonsDisabled() {

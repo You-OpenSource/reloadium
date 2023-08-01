@@ -5,13 +5,12 @@ package rw.tests.ui.fixtures;
 import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.data.RemoteComponent;
 import com.intellij.remoterobot.fixtures.CommonContainerFixture;
-import com.intellij.remoterobot.fixtures.ComponentFixture;
 import com.intellij.remoterobot.fixtures.DefaultXpath;
 import com.intellij.remoterobot.fixtures.FixtureName;
+import com.intellij.remoterobot.fixtures.JButtonFixture;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
-import static com.intellij.remoterobot.utils.UtilsKt.hasAnyComponent;
 
 
 @DefaultXpath(by = "FlatWelcomeFrame type", xpath = "//div[@class='FlatWelcomeFrame']")
@@ -21,21 +20,10 @@ public class WelcomeFrameFixture extends CommonContainerFixture {
         super(remoteRobot, remoteComponent);
     }
 
-    public ComponentFixture createNewProjectLink() {
-        return welcomeFrameLink("New Project");
-    }
-
-    public ComponentFixture openProjectLink() {
-        return welcomeFrameLink("Open");
-    }
-
-    private ComponentFixture welcomeFrameLink(String text) {
-        if (hasAnyComponent(this, byXpath("//div[@class='NewRecentProjectPanel']"))) {
-            return find(ComponentFixture.class, byXpath("//div[@class='JBOptionButton' and @text='" + text + "']"));
-        }
-        return find(
-                ComponentFixture.class,
-                byXpath("//div[@class='NonOpaquePanel'][./div[@text='" + text + "']]//div[@class='JButton']")
+    public JButtonFixture createNewProjectButton() {
+        return this.find(
+                JButtonFixture.class,
+                byXpath("//div[@defaulticon='createNewProjectTab.svg']")
         );
     }
 }

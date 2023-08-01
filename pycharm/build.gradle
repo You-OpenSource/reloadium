@@ -1,47 +1,14 @@
-import java.util.stream.Collectors
-
 plugins {
     id('java')
-    id('org.jetbrains.intellij') version '1.9.0'
-    id("org.jetbrains.kotlin.jvm") version "1.7.20-RC"
+    id('org.jetbrains.intellij') version '1.13.0'
+    id("org.jetbrains.kotlin.jvm") version "1.8.10"
     id('com.adarshr.test-logger') version '3.1.0'
-    // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "1.3.1"
-    // Gradle Qodana Plugin
-    id("org.jetbrains.qodana") version "0.1.13"
 }
+
 
 group 'com.reloadware'
-version '0.8.5' //  # RwRender: version '{{ ctx.version }}' //
-group = project.findProperty("pluginGroup")
-version = project.findProperty("pluginVersion")
+version '1.2.0' //  # RwRender: version '{{ ctx.version }}' //
 
-def intellijVersion =   project.findProperty("platformVersion")
-def intellijType = project.findProperty("platformType")
-def intellijPlugins = Arrays.stream(project.findProperty("platformPlugins").split(',')).map(String::trim).filter((s) -> s.length() > 0).collect(Collectors.toList())
-def buildDownloadSources = project.findProperty("platformDownloadSources").toBoolean()
-
-def intellijMinorVersion = intellijVersion.substring(0, 6)
-if (intellijVersion != '2019.2' && intellijType == 'PC') {
-    // only PyCharm 2019.2 seems to provide com.jetbrains.python.psi itself
-    intellijPlugins.add('PythonCore')
-    // see https://plugins.jetbrains.com/plugin/7322-python-community-edition/versions
-} else if (intellijVersion != '2019.2' && intellijType == 'PY') {
-    // PyCharm Professional uses another python plugin
-    intellijPlugins.add('Pythonid')
-    // see https://plugins.jetbrains.com/plugin/631-python/versions
-}
-if (intellijType == 'PY' || intellijMinorVersion in ['2019.2', '2019.3','2020.1', '2020.2', '2020.3', '2021.1']) {
-    // we can get no sources for pycharm professional
-    // or versions where the source code does not reside in ivy
-    // (2021 JCenter shut down and it seems that JetBrains did not publish/migrate older sources to ivy)
-    buildDownloadSources = false
-}
-if (intellijType == 'PY' && intellijMinorVersion in ['2022.1','2022.2'] ) {
-    // https://youtrack.jetbrains.com/issue/IJSDK-1427/Running-tests-for-PyCharm-Professional-is-not-working
-    // testing with PY since 2022.1 requires to also add com.intellij.platform.images (automatically provided in PC)
-    intellijPlugins.add('com.intellij.platform.images')
-}
 
 repositories {
     mavenCentral()
@@ -63,32 +30,38 @@ repositories {
     }
 }
 
+sourceCompatibility=17
 def remoteRobotVersion = "0.11.16"
+def intellijVersion = "2023.1.1" //  # RwRender: def intellijVersion = "{{ ctx.intellij_version }}" //
+def intellijPro = false  //  # RwRender: def intellijPro = {{ ctx.pro }}  //
+
 
 dependencies {
-    implementation('io.sentry:sentry:6.4.1') {
+    implementation('io.sentry:sentry:6.7.0') {
         exclude group: 'org.slf4j'
     }
 
     implementation(
-            'net.lingala.zip4j:zip4j:2.11.1',
+            'net.lingala.zip4j:zip4j:2.11.2',
             'commons-io:commons-io:2.11.0',
+            "ee.carlrobert:openai-client:1.1.2",
+            'com.knuddels:jtokkit:0.1.0'
     )
 
     testImplementation(
             'com.intellij.remoterobot:remote-robot:' + remoteRobotVersion,
             'com.intellij.remoterobot:remote-fixtures:' + remoteRobotVersion,
-            'com.squareup.okhttp3:logging-interceptor:4.10.0',
             "com.redhat.devtools.intellij:intellij-common:1.1.0",
             'org.junit.jupiter:junit-jupiter-api:5.9.0',
             'com.redhat.devtools.intellij:intellij-common-ui-test-library:0.2.0',
             'com.automation-remarks:video-recorder-junit5:2.0',
             'org.mock-server:mockserver-netty:5.14.0',
-            'org.mock-server:mockserver-client-java:5.14.0:shaded',
             'org.assertj:assertj-core:3.23.1',
             'org.powermock:powermock-core:2.0.9',
-            'org.mockito:mockito-inline:4.7.0',
-            'org.mockito:mockito-junit-jupiter:4.7.0'
+            'org.mockito:mockito-inline:4.8.0',
+            'org.mockito:mockito-junit-jupiter:4.8.0',
+            'org.junit-pioneer:junit-pioneer:1.9.0',
+            'org.skyscreamer:jsonassert:1.5.1',
     )
     testRuntimeOnly(
             'org.junit.jupiter:junit-jupiter-engine:5.9.0'
@@ -118,21 +91,18 @@ sourceSets {
 }
 
 intellij {
-    version = intellijVersion
-    type = intellijType
-    downloadSources = intellijDownloadSources as Boolean
-    plugins = [intellijPlugin]
+    if (intellijPro) {
+        version = 'PY-' + intellijVersion
+        type = 'PY'
+        plugins = ["python"]
+    } else {
+        version = intellijVersion
+        type = "PC"
+        plugins = ["PythonCore"]
+    }
+    downloadSources = true
     updateSinceUntilBuild = false
 }
-
-// Pro
-//intellij {
-//    version = 'PY-2021.3.2'
-//    type = 'PY'
-//    downloadSources = true
-//    plugins = ["python"]
-//    updateSinceUntilBuild = false
-//}
 
 test {
     useJUnitPlatform()
@@ -158,18 +128,17 @@ publishPlugin {
 }
 
 runPluginVerifier {
-    ideVersions = ["IU-222.3739.54","IU-211.7628.21", "IU-212.5712.43 ", "IU-213.7172.25", "IU-221.5080.93", "IU-203.8084.24"]
+    ideVersions = ["IU-231.8770.17", "IU-223.8836.14", "IU-222.4345.14"]
 }
 
-tasks.processResources{
+tasks.processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 runIde {
     jvmArgs '-Xmx8G'
+    intellij {
+        autoReloadPlugins = true
+    }
     maxHeapSize = "8g"
-}
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
 }
