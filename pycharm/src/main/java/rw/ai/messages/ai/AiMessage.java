@@ -144,7 +144,6 @@ public class AiMessage extends Message
                     }
                     
                     public void onError(final ErrorDetails error) {
-                        super.onError(error);
                         This.getView().makeErrored();
                         This.append( error.getMessage());
                         This.onComplete();
@@ -153,7 +152,6 @@ public class AiMessage extends Message
                     }
                     
                     public void onComplete(final StringBuilder messageBuilder) {
-                        super.onComplete(messageBuilder);
                         This.onComplete();
                         AiMessage.this.messageListener.onComplete(This);
                     }

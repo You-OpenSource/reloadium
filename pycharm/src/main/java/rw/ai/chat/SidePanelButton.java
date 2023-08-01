@@ -96,8 +96,6 @@ abstract class SidePanelButton extends JButton
             return new State[] { State.HOVER, State.PRESSED, State.DEFAULT };
         }
         
-        static {
-            $VALUES = $values();
-        }
+
     }
 }

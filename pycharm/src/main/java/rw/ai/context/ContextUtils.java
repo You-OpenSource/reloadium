@@ -25,10 +25,10 @@ public class ContextUtils
         final StringBuilder numberedCode = new StringBuilder();
         for (int i = 0; i < lines.size(); ++i) {
             final int line = firstLine + i + 1;
-            final String gutter = String.format(  gutterSize, new Object[] { line });
+            final String gutter = line + " ";
             numberedCode.append(gutter).append(": ").append(lines.get(i)).append("\n");
         }
-        return  numberedCode;
+        return  numberedCode.toString();
     }
     
     @NotNull

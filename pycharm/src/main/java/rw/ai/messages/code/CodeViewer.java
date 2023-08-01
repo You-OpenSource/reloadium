@@ -155,7 +155,7 @@ public class CodeViewer extends MessagePart implements Disposable
             }
             
             public void onError(final ErrorDetails error) {
-                super.onError(error);
+//                super.onError(error);
                 CodeViewer.LOGGER.warn(String.format("Got error when predicting extension \"%s\"", error.getMessage()));
             }
             
@@ -290,7 +290,7 @@ public class CodeViewer extends MessagePart implements Disposable
             }
             this.dispose();
             this.setLayout(new GridBagLayout());
-            this.file = new LightVirtualFile("code." + extension, Language.findLanguageByID(extension));
+            this.file = new LightVirtualFile("code." + extension, "py");
             this.document = FileDocumentManager.getInstance().getDocument((VirtualFile)this.file);
             assert this.document != null;
             this.document.addDocumentListener((DocumentListener)new DocumentListener() {

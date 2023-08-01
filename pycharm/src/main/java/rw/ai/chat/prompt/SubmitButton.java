@@ -93,9 +93,7 @@ public class SubmitButton extends JLabel
             return new State[] { State.SUBMIT, State.STOP };
         }
         
-        static {
-            $VALUES = $values();
-        }
+
     }
     
     interface SubmitListener

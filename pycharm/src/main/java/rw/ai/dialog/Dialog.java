@@ -209,7 +209,7 @@ public class Dialog implements Disposable
                 break;
             }
             default: {
-                throw new IllegalArgumentException(  model.getType());
+                throw new IllegalArgumentException(  "model.getType()");
             }
         }
         this.component.addMessage(message.getView());
@@ -280,7 +280,6 @@ public class Dialog implements Disposable
             }
             
             public void onError(final ErrorDetails error) {
-                super.onError(error);
                 Dialog.LOGGER.info(String.format("Got error while proposing a name \"%s\"", error.getMessage()));
             }
             
