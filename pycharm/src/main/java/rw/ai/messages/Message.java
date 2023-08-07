@@ -103,14 +103,14 @@ public class Message implements Disposable
                 partCounter.addAndGet(1);
             }
         });
-        final VisitHandler<FencedCodeBlock> codeVisitHandler = (VisitHandler<FencedCodeBlock>)new VisitHandler((Class)FencedCodeBlock.class, node -> {
+        final VisitHandler<Paragraph> codeVisitHandler = (VisitHandler<Paragraph>)new VisitHandler((Class)FencedCodeBlock.class, node -> {
             final CodeViewer part = (CodeViewer)this.getOrCreatePart((Block)node, partCounter.get());
             if (part != null) {
                 part.setContentWithExtensionPrediction(node.getChildChars().toString());
                 partCounter.addAndGet(1);
             }
         });
-        final NodeVisitor nodeVisitor = new NodeVisitor((Collection)List.of(codeVisitHandler, (VisitHandler<FencedCodeBlock>)textVisitHandler));
+        final NodeVisitor nodeVisitor = new NodeVisitor((Collection)List.of(codeVisitHandler, (VisitHandler<Paragraph>)textVisitHandler));
         final Parser parser = Parser.builder().postProcessorFactory((PostProcessorFactory)new CombineParagraphsPostProcessor.Factory()).build();
         final Node document = (Node)parser.parse(rawContent);
         nodeVisitor.visit(document);

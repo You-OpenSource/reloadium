@@ -71,10 +71,9 @@ public class DialogManager implements Disposable
             }
             final String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString((Object)fileContent);
             if (this.file instanceof LightVirtualFile) {
-                final String s;
                 ApplicationManager.getApplication().invokeLater(() -> WriteCommandAction.runWriteCommandAction(this.project, () -> {
                     try {
-                        this.file.setBinaryContent(s.getBytes(StandardCharsets.UTF_8));
+                        this.file.setBinaryContent(jsonString.getBytes(StandardCharsets.UTF_8));
                     }
                     catch (IOException e) {
                         RwSentry.get().captureException(e, false);

@@ -34,7 +34,8 @@ public class DialogComponent extends JPanel
     private Prompt prompt;
     private JBScrollPane outputPane;
     private OutputContent outputContent;
-    
+    private JScrollBar verticalScrollBar;
+
     public DialogComponent(@NotNull final Project project, final Prompt.Listener promptListener) {
         if (project == null) {
             $$$reportNull$$$0(0);
@@ -62,7 +63,6 @@ public class DialogComponent extends JPanel
     }
     
     private void scrollToBottom() {
-        final JScrollBar verticalScrollBar;
         ApplicationManager.getApplication().invokeLater(() -> {
             verticalScrollBar = this.outputPane.getVerticalScrollBar();
             verticalScrollBar.setValue(verticalScrollBar.getMaximum());
@@ -82,19 +82,19 @@ public class DialogComponent extends JPanel
         (this.outputPane = new JBScrollPane((Component)this.outputContent)).setBorder(BorderFactory.createEmptyBorder());
         this.outputPane.setVerticalScrollBarPolicy(20);
         this.outputPane.setDoubleBuffered(true);
-        final JScrollBar verticalScrollbar = this.outputPane.getVerticalScrollBar();
-        final JViewport viewport;
-        final int currentHeight;
-        final JScrollBar scrollBar;
-        final int currentPosition;
-        final int maxPosition;
-        final int extent;
+
         final ChangeListener viewportChangeListener = e -> {
+            JScrollBar verticalScrollbar = this.outputPane.getVerticalScrollBar();
+            JViewport viewport;
+            int currentHeight;
+            int currentPosition;
+            int maxPosition;
+            int extent;
             viewport = (JViewport)e.getSource();
             currentHeight = viewport.getViewSize().height;
-            currentPosition = scrollBar.getValue();
-            maxPosition = scrollBar.getMaximum();
-            extent = scrollBar.getModel().getExtent();
+            currentPosition = verticalScrollBar.getValue();
+            maxPosition = verticalScrollBar.getMaximum();
+            extent = verticalScrollBar.getModel().getExtent();
             if (currentHeight != maxPosition && currentPosition + extent >= maxPosition) {
                 viewport.setViewPosition(new Point(0, currentHeight - viewport.getExtentSize().height));
             }

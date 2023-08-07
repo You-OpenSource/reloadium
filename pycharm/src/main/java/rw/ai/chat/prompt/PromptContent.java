@@ -78,9 +78,7 @@ public class PromptContent extends JTextArea
                 clipboardText = (String)contents.getTransferData(DataFlavor.stringFlavor);
             }
             catch (UnsupportedFlavorException | IOException ex2) {
-                final Exception ex;
-                final Exception e = ex;
-                RwSentry.get().captureException(e, true);
+                RwSentry.get().captureException(ex2, true);
                 return;
             }
             modifiedText = StringsKt.trimIndent(clipboardText).strip();

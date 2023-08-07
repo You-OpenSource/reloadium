@@ -43,12 +43,12 @@ public class DialogButton extends SidePanelButton
         }
         this.active = false;
         this.popupMenu = new JPopupMenu();
-        final RenameDialog renameDialog;
+        final RenameDialog[] renameDialog = new RenameDialog[1];
         (this.rename = new JMenuItem("Rename", AllIcons.Actions.Edit)).addActionListener(e -> {
-            renameDialog = new RenameDialog(this.getText());
-            renameDialog.show();
-            if (renameDialog.getExitCode() == 0) {
-                this.doRename(renameDialog.getNewName());
+            renameDialog[0] = new RenameDialog(this.getText());
+            renameDialog[0].show();
+            if (renameDialog[0].getExitCode() == 0) {
+                this.doRename(renameDialog[0].getNewName());
             }
             return;
         });

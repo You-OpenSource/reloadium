@@ -8,6 +8,7 @@ import ee.carlrobert.openai.client.completion.chat.ChatCompletionClient;
 import ee.carlrobert.openai.client.completion.CompletionRequest;
 import ee.carlrobert.openai.client.completion.chat.ChatCompletionModel;
 import ee.carlrobert.openai.client.completion.chat.request.ChatCompletionRequest;
+import org.apache.commons.lang.NotImplementedException;
 import rw.ai.openai.ClientFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import java.util.Iterator;
@@ -140,7 +141,8 @@ public class AiMessage extends Message
             protected Void doInBackground() {
                 final CompletionEventListener eventListener = (CompletionEventListener)new CompletionEventListener() {
                     public void onMessage(final String message) {
-                        SwingWorker.this.publish(message);
+                        throw new NotImplementedException("That's the end part");
+//                        SwingWorker.this.publish(message);
                     }
                     
                     public void onError(final ErrorDetails error) {

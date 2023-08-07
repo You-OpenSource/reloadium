@@ -40,9 +40,8 @@ public class ReMessageStarRepo extends ReMessage
         }
         this.setRawContent(AiBundle.message("ai.remessage.star.repo", new Object[0]));
         this.getView().addButton();
-        final String url;
         this.getView().addButtonListener(e -> {
-            url = RwBundle.message("repo.url", new Object[0]);
+            String url = RwBundle.message("repo.url", new Object[0]);
             try {
                 Desktop.getDesktop().browse(URI.create(url));
             }

@@ -54,37 +54,31 @@ public class ReMessageTmpChat extends ReMessage
         this.file = file;
         this.setRawContent(AiBundle.message("ai.remessage.tmp.chat", new Object[0]));
         this.getView().addButton();
-        final FileSaverDialog saver;
-        final VirtualFileWrapper fileWrapper;
-        VirtualFile newFile;
-        byte[] content;
-        byte[] finalContent;
-        final VirtualFile virtualFile;
-        final byte[] binaryContent;
-        FileEditorManager fileEditorManager;
+
         this.getView().addAiPreferencesActionListner(e -> {
-            saver = FileChooserFactory.getInstance().createSaveFileDialog(new FileSaverDescriptor(IdeBundle.message("dialog.title.save.as", new Object[0]), IdeBundle.message("label.choose.target.file", new Object[0]), new String[0]), project);
-            fileWrapper = saver.save(ProjectUtil.guessProjectDir(project),  project.getName().toLowerCase()+ ChatFileType.EXTENSION);
+            FileSaverDialog saver = FileChooserFactory.getInstance().createSaveFileDialog(new FileSaverDescriptor(IdeBundle.message("dialog.title.save.as", new Object[0]), IdeBundle.message("label.choose.target.file", new Object[0]), new String[0]), project);
+            VirtualFileWrapper fileWrapper = saver.save(ProjectUtil.guessProjectDir(project),  project.getName().toLowerCase()+ ChatFileType.EXTENSION);
             if (fileWrapper != null) {
-                newFile = fileWrapper.getVirtualFile(true);
+                VirtualFile newFile = fileWrapper.getVirtualFile(true);
                 if (newFile != null) {
-                    content = new byte[0];
+                    byte[] content;
                     try {
                         content = file.contentsToByteArray();
                     }
                     catch (IOException ex) {
                         RwSentry.get().captureException(ex, false);
+                        content = new byte[0];
                     }
-                    finalContent = content;
+                    byte[] finalContent1 = content;
                     ApplicationManager.getApplication().runWriteAction(() -> {
                         try {
-                            virtualFile.setBinaryContent(binaryContent);
+                            newFile.setBinaryContent(finalContent1);
                         }
                         catch (IOException ex2) {
                             RwSentry.get().captureException(ex2, false);
                         }
-                        fileEditorManager = FileEditorManager.getInstance(project);
-                        fileEditorManager.openFile(virtualFile, true);
+                        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+                        fileEditorManager.openFile(newFile, true);
                         fileEditorManager.closeFile(file);
                     });
                 }

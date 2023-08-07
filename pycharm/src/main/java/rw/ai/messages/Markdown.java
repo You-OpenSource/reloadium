@@ -132,9 +132,7 @@ public class Markdown extends MessagePart
                                 Desktop.getDesktop().browse(e.getURL().toURI());
                             }
                             catch (IOException | URISyntaxException ex3) {
-                                final Exception ex2;
-                                final Exception ex = ex2;
-                                JOptionPane.showMessageDialog((Component)null, ex.getMessage(), "Error", 0);
+                                JOptionPane.showMessageDialog((Component)null, ex3.getMessage(), "Error", 0);
                             }
                         }
                         else {
@@ -165,8 +163,8 @@ public class Markdown extends MessagePart
             }
             final MutableDataSet options = new MutableDataSet();
             options.setFrom((MutableDataSetter)ParserEmulationProfile.GITHUB_DOC);
-            options.set(Parser.EXTENSIONS, (Object)List.of(AbbreviationExtension.create(), DefinitionExtension.create(), FootnoteExtension.create(), TablesExtension.create(), EmojiExtension.create()));
-            options.set(HtmlRenderer.SOFT_BREAK, (Object)"<br />\n");
+            options.set(Parser.EXTENSIONS, List.of(AbbreviationExtension.create(), DefinitionExtension.create(), FootnoteExtension.create(), TablesExtension.create(), EmojiExtension.create()));
+            options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
             final Parser parser = Parser.builder((DataHolder)options).build();
             final HtmlRenderer renderer = HtmlRenderer.builder((DataHolder)options).build();
             final Node document = (Node)parser.parse(content);
@@ -182,9 +180,7 @@ public class Markdown extends MessagePart
                 this.repaint();
             }
             catch (BadLocationException | IOException ex2) {
-                final Exception ex;
-                final Exception e = ex;
-                RwSentry.get().captureException(e, true);
+                RwSentry.get().captureException(ex2, true);
             }
         }
         

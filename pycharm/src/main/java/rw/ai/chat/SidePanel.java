@@ -145,8 +145,8 @@ public class SidePanel extends JPanel
         }
         this.scrollPane.revalidate();
         this.scrollPane.repaint();
-        final JScrollBar verticalScrollBar;
         ApplicationManager.getApplication().invokeLater(() -> {
+            JScrollBar verticalScrollBar;
             verticalScrollBar = this.scrollPane.getVerticalScrollBar();
             verticalScrollBar.setValue(verticalScrollBar.getMaximum());
         });
