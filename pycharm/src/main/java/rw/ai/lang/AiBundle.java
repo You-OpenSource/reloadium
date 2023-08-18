@@ -14,34 +14,18 @@ public final class AiBundle extends DynamicBundle
 {
     @NonNls
     public static final String BUNDLE = "messages.AiBundle";
-    private static final AiBundle INSTANCE;
+    private static final AiBundle INSTANCE = new AiBundle();
     
     private AiBundle() {
         super("messages.AiBundle");
     }
-    
+
     @NotNull
-    @Nls
-    public static String message(@NotNull @PropertyKey(resourceBundle = "messages.AiBundle") final String key, final Object... params) {
-        if (key == null) {
-            $$$reportNull$$$0(0);
+    public static @Nls String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, Object @NotNull ... params) {
+        if (INSTANCE.containsKey(key)) {
+            return INSTANCE.getMessage(key, params);
         }
-        if (params == null) {
-            $$$reportNull$$$0(1);
-        }
-        if (AiBundle.INSTANCE.containsKey(key)) {
-            final String message = AiBundle.INSTANCE.getMessage(key, params);
-            if (message == null) {
-                $$$reportNull$$$0(2);
-            }
-            return message;
-        }
-        final AiBundle instance = AiBundle.INSTANCE;
-        return message(key, params);
-    }
-    
-    static {
-        INSTANCE = new AiBundle();
+        return INSTANCE.message(key, params);
     }
     
     private static /* synthetic */ void $$$reportNull$$$0(final int n) {
