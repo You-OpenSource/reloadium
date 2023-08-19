@@ -92,11 +92,16 @@ public class DialogComponent extends JPanel
             int extent;
             viewport = (JViewport)e.getSource();
             currentHeight = viewport.getViewSize().height;
-            currentPosition = verticalScrollBar.getValue();
-            maxPosition = verticalScrollBar.getMaximum();
-            extent = verticalScrollBar.getModel().getExtent();
+            try {
+                currentPosition = verticalScrollBar.getValue();
+                maxPosition = verticalScrollBar.getMaximum();
+                extent = verticalScrollBar.getModel().getExtent();
+
             if (currentHeight != maxPosition && currentPosition + extent >= maxPosition) {
                 viewport.setViewPosition(new Point(0, currentHeight - viewport.getExtentSize().height));
+            }
+            }catch (Exception ee){
+                System.out.println(ee.toString());
             }
             return;
         };

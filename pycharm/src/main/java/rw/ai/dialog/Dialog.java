@@ -242,7 +242,7 @@ public class Dialog implements Disposable
         this.addMessage(msg);
         this.updateAllowedMessages();
         this.addAiMessage();
-        Stats.get().onNewMessage();
+//        Stats.get().onNewMessage();
     }
     
     public void addAiMessage() {
@@ -334,7 +334,8 @@ public class Dialog implements Disposable
     }
     
     private void addStartRepoMessageWhenNeeded() {
-        if (Dialog.STAR_REPO_THRESHOLDS.contains(Stats.get().getState().messagesN)) {
+//        if (Dialog.STAR_REPO_THRESHOLDS.contains(Stats.get().getState().messagesN)) {
+        if(false) {
             if (ApplicationManager.getApplication().isUnitTestMode()) {
                 this.addReMessageStarRepo();
             }

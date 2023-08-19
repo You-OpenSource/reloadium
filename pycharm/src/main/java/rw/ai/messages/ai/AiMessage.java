@@ -124,9 +124,8 @@ public class AiMessage extends Message
     
     public void start() {
         this.getView().getMsgContainer().add(this.thinkingMarkdown.getView());
-        final List<ChatCompletionMessage> messages = new LinkedList<>();
-//        this.history.stream().filter(n -> n.getRole() != null)
-//        .map(n -> new ChatCompletionMessage(n.getRole(), n.getAiContent())) ;
+        final List<ChatCompletionMessage> messages = this.history.stream().filter(n -> n.getRole() != null)
+        .map(n -> new ChatCompletionMessage(n.getRole(), n.getAiContent())).collect(Collectors.toList());
         if (messages.isEmpty()) {
             this.append(AiBundle.message("ai.message.too.long", new Object[0]));
             this.getView().onComplete();
@@ -141,7 +140,8 @@ public class AiMessage extends Message
             protected Void doInBackground() {
                 final CompletionEventListener eventListener = (CompletionEventListener)new CompletionEventListener() {
                     public void onMessage(final String message) {
-                        throw new NotImplementedException("That's the end part");
+                        This.append(message);
+//                        throw new NotImplementedException("That's the end part");
 //                        SwingWorker.this.publish(message);
                     }
                     

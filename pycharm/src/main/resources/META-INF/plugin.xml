@@ -32,6 +32,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="rw.audit.ErrorSubmitter"/>
 
+        <fileEditorProvider implementation="rw.ai.chat.ChatProvider"/>
+
         <projectConfigurable
                 parentId="tools"
                 instance="rw.settings.ProjectSettingsConfigurable"
@@ -68,7 +70,9 @@
                 serviceImplementation="rw.service.Service"
         />
 
+
         <postStartupActivity implementation="rw.service.Startup"/>
+        <postStartupActivity implementation="rw.ai.Startup"/>
 
         <fileDocumentManagerListener implementation="rw.action.ReloadOnSave"/>
         <fileIconPatcher implementation="rw.icons.IconPatcher" order="last"/>
