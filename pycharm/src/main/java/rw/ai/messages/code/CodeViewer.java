@@ -4,58 +4,50 @@
 
 package rw.ai.messages.code;
 
-import com.intellij.openapi.editor.Editor;
-import java.awt.Dimension;
-import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
-import rw.ai.context.ContextUtils;
-import java.awt.Insets;
-import com.intellij.util.ui.JBInsets;
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.StringSelection;
-import com.intellij.openapi.ide.CopyPasteManager;
-import java.awt.event.MouseEvent;
-import java.awt.event.AdjustmentEvent;
-import java.awt.Point;
-import javax.swing.JViewport;
-import java.awt.event.AdjustmentListener;
-import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.EditorKind;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import java.awt.LayoutManager;
-import java.awt.GridBagLayout;
-import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.impl.EditorImpl;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import rw.ai.messages.MessagePartType;
-import rw.ai.dialog.Dialog;
-import ee.carlrobert.openai.client.completion.chat.ChatCompletionClient;
-import ee.carlrobert.openai.client.completion.CompletionRequest;
-import com.intellij.util.ui.UIUtil;
-import ee.carlrobert.openai.client.completion.ErrorDetails;
-import ee.carlrobert.openai.client.completion.CompletionEventListener;
-import ee.carlrobert.openai.client.completion.chat.ChatCompletionModel;
-import ee.carlrobert.openai.client.completion.chat.request.ChatCompletionRequest;
-import java.util.List;
-import ee.carlrobert.openai.client.completion.chat.request.ChatCompletionMessage;
-import rw.ai.openai.ClientFactory;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
-import java.util.Map;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.Disposable;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.testFramework.LightVirtualFile;
+import com.intellij.util.ui.JBInsets;
+import com.intellij.util.ui.UIUtil;
+import ee.carlrobert.openai.client.completion.CompletionEventListener;
+import ee.carlrobert.openai.client.completion.CompletionRequest;
+import ee.carlrobert.openai.client.completion.ErrorDetails;
+import ee.carlrobert.openai.client.completion.chat.ChatCompletionClient;
+import ee.carlrobert.openai.client.completion.chat.ChatCompletionModel;
+import ee.carlrobert.openai.client.completion.chat.request.ChatCompletionMessage;
+import ee.carlrobert.openai.client.completion.chat.request.ChatCompletionRequest;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import rw.ai.context.ContextUtils;
+import rw.ai.dialog.Dialog;
 import rw.ai.messages.MessagePart;
+import rw.ai.messages.MessagePartType;
+import rw.ai.openai.ClientFactory;
 
-public class CodeViewer extends MessagePart implements Disposable
-{
+import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.Map;
+
+public class CodeViewer extends MessagePart implements Disposable {
     private static final Logger LOGGER;
     private static final int PREDICTION_THRESHOLD = 200;
     static Map<String, String> LANG_TO_EXT;
@@ -64,7 +56,7 @@ public class CodeViewer extends MessagePart implements Disposable
     View view;
     private boolean predictedPartial;
     private boolean predicted;
-    
+
     public CodeViewer(@NotNull final Project project, @Nullable String language) {
         if (project == null) {
             $$$reportNull$$$0(0);
@@ -81,7 +73,7 @@ public class CodeViewer extends MessagePart implements Disposable
         }
         this.setExtension(extension);
     }
-    
+
     public CodeViewer(@NotNull final Project project, @NotNull final Model model) {
         if (project == null) {
             $$$reportNull$$$0(1);
@@ -95,23 +87,23 @@ public class CodeViewer extends MessagePart implements Disposable
         this.setExtension(model.getExtension());
         this.setContent(model.getContent());
     }
-    
+
     public void setExtension(final String extension) {
         this.model.setExtension(extension);
         this.view.create(extension);
         this.view.setContent(this.model.getContent());
     }
-    
+
     @Override
     public View getView() {
         return this.view;
     }
-    
+
     @Override
     public Model getModel() {
         return this.model;
     }
-    
+
     @Override
     public void setContent(@NotNull final String content) {
         if (content == null) {
@@ -120,7 +112,7 @@ public class CodeViewer extends MessagePart implements Disposable
         this.view.setContent(content);
         this.model.setContent(content);
     }
-    
+
     public void setContentWithExtensionPrediction(@NotNull final String content) {
         if (content == null) {
             $$$reportNull$$$0(4);
@@ -131,7 +123,7 @@ public class CodeViewer extends MessagePart implements Disposable
             this.predictExtension();
         }
     }
-    
+
     private void predictExtension() {
         if (this.gotExtensionFromLanguage) {
             return;
@@ -145,20 +137,20 @@ public class CodeViewer extends MessagePart implements Disposable
         content = content.replaceAll("#.*\\n", "");
         final String prompt = systemMsg + content;
         final List<ChatCompletionMessage> messages = List.of(new ChatCompletionMessage("user", prompt));
-        ChatCompletionRequest.Builder builder = new ChatCompletionRequest.Builder((List)messages);
+        ChatCompletionRequest.Builder builder = new ChatCompletionRequest.Builder((List) messages);
         builder = builder.setModel(ChatCompletionModel.GPT_3_5);
         final ChatCompletionRequest request = builder.build();
         final StringBuilder ret = new StringBuilder();
-        final CompletionEventListener eventListener = (CompletionEventListener)new CompletionEventListener() {
+        final CompletionEventListener eventListener = (CompletionEventListener) new CompletionEventListener() {
             public void onMessage(final String message) {
                 ret.append(message);
             }
-            
+
             public void onError(final ErrorDetails error) {
 //                super.onError(error);
                 CodeViewer.LOGGER.warn(String.format("Got error when predicting extension \"%s\"", error.getMessage()));
             }
-            
+
             public void onComplete(final StringBuilder messageBuilder) {
                 String predicted = ret.toString().strip();
                 predicted = predicted.replace("\\.", "");
@@ -171,9 +163,9 @@ public class CodeViewer extends MessagePart implements Disposable
                 UIUtil.invokeLaterIfNeeded(() -> CodeViewer.this.setExtension(finalPredicted));
             }
         };
-        client.stream((CompletionRequest)request, eventListener);
+        client.stream((CompletionRequest) request, eventListener);
     }
-    
+
     @Override
     public void onFinished() {
         if (!this.predicted) {
@@ -181,16 +173,16 @@ public class CodeViewer extends MessagePart implements Disposable
             this.predicted = true;
         }
     }
-    
+
     public void dispose() {
         this.view.dispose();
     }
-    
+
     static {
-        LOGGER = Logger.getInstance((Class)Dialog.class);
+        LOGGER = Logger.getInstance((Class) Dialog.class);
         CodeViewer.LANG_TO_EXT = Map.ofEntries(Map.entry("java", "java"), Map.entry("python", "py"), Map.entry("kotlin", "kt"), Map.entry("javascript", "js"), Map.entry("typescript", "ts"), Map.entry("json", "json"), Map.entry("txt", "txt"), Map.entry("sql", "sql"), Map.entry("xml", "xml"), Map.entry("yaml", "yaml"), Map.entry("html", "html"), Map.entry("css", "css"), Map.entry("yml", "yaml"));
     }
-    
+
     private static /* synthetic */ void $$$reportNull$$$0(final int n) {
         final String format = "Argument for @NotNull parameter '%s' of %s.%s must not be null";
         final Object[] args = new Object[3];
@@ -226,48 +218,46 @@ public class CodeViewer extends MessagePart implements Disposable
         }
         throw new IllegalArgumentException(String.format(format, args));
     }
-    
-    public static class Model extends MessagePart.Model
-    {
+
+    public static class Model extends MessagePart.Model {
         String extension;
         String language;
-        
+
         public Model() {
             this.extension = null;
             this.language = null;
         }
-        
+
         public String getExtension() {
             return this.extension;
         }
-        
+
         public void setExtension(@NotNull final String extension) {
             if (extension == null) {
                 $$$reportNull$$$0(0);
             }
             this.extension = extension;
         }
-        
+
         @Override
         public MessagePartType getType() {
             return MessagePartType.CODE;
         }
-        
+
         public String getLanguage() {
             return this.language;
         }
-        
+
         public void setLanguage(@Nullable final String language) {
             this.language = language;
         }
-        
+
         private static /* synthetic */ void $$$reportNull$$$0(final int n) {
             throw new IllegalArgumentException(String.format("Argument for @NotNull parameter '%s' of %s.%s must not be null", "extension", "rw/ai/messages/code/CodeViewer$Model", "setExtension"));
         }
     }
-    
-    public static class View extends MessagePart.View implements Disposable
-    {
+
+    public static class View extends MessagePart.View implements Disposable {
         static final int EDITOR_WIDTH = 400;
         @NotNull
         Project project;
@@ -276,94 +266,96 @@ public class CodeViewer extends MessagePart implements Disposable
         private EditorImpl editor;
         private Document document;
         private LightVirtualFile file;
-        
+
         public View(@NotNull final Project project) {
             if (project == null) {
                 $$$reportNull$$$0(0);
             }
             this.project = project;
         }
-        
+
         private void create(@NotNull final String extension) {
             if (extension == null) {
                 $$$reportNull$$$0(1);
             }
-            this.dispose();
-            this.setLayout(new GridBagLayout());
-            this.file = new LightVirtualFile("code." + extension, "py");
-            this.document = FileDocumentManager.getInstance().getDocument((VirtualFile)this.file);
-            assert this.document != null;
-            this.document.addDocumentListener((DocumentListener)new DocumentListener() {
-                public void documentChanged(@NotNull final DocumentEvent event) {
-                    if (event == null) {
-                        $$$reportNull$$$0(0);
+            SwingUtilities.invokeLater(() -> {
+                this.dispose();
+                this.setLayout(new GridBagLayout());
+                this.file = new LightVirtualFile("code." + extension, "py");
+                this.document = FileDocumentManager.getInstance().getDocument((VirtualFile) this.file);
+                assert this.document != null;
+                this.document.addDocumentListener((DocumentListener) new DocumentListener() {
+                    public void documentChanged(@NotNull final DocumentEvent event) {
+                        if (event == null) {
+                            $$$reportNull$$$0(0);
+                        }
+                        View.this.resizeToContent();
                     }
-                    View.this.resizeToContent();
-                }
-                
-                private static /* synthetic */ void $$$reportNull$$$0(final int n) {
-                    throw new IllegalArgumentException(String.format("Argument for @NotNull parameter '%s' of %s.%s must not be null", "event", "rw/ai/messages/code/CodeViewer$View$1", "documentChanged"));
-                }
+
+                    private static /* synthetic */ void $$$reportNull$$$0(final int n) {
+                        throw new IllegalArgumentException(String.format("Argument for @NotNull parameter '%s' of %s.%s must not be null", "event", "rw/ai/messages/code/CodeViewer$View$1", "documentChanged"));
+                    }
+                });
+                this.editor = (EditorImpl) EditorFactory.getInstance().createEditor(this.document, this.project, (VirtualFile) this.file, true, EditorKind.MAIN_EDITOR);
+                this.editor.getComponent().setAutoscrolls(false);
+                this.editor.setVerticalScrollbarVisible(false);
+                this.editor.getScrollPane().getHorizontalScrollBar().setEnabled(false);
+                final JViewport viewport = this.editor.getScrollPane().getViewport();
+                final Point currentPosition = viewport.getViewPosition();
+                this.editor.getScrollPane().getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+                    @Override
+                    public void adjustmentValueChanged(final AdjustmentEvent e) {
+                        viewport.setViewPosition(currentPosition);
+                    }
+                });
+                (this.actions = new JPanel(new GridBagLayout())).setOpaque(false);
+                this.setOpaque(false);
+                (this.copy = new ActionButton("Copy", "Copied!", new ActionButton.ClickedListener() {
+                    @Override
+                    public void clicked(final MouseEvent e) {
+                        final CopyPasteManager copyPasteManager = CopyPasteManager.getInstance();
+                        final Transferable transferable = new StringSelection(View.this.document.getText());
+                        copyPasteManager.setContents(transferable);
+                    }
+                })).setOpaque(false);
+                GridBagConstraints c = new GridBagConstraints();
+                c.anchor = 17;
+                c.gridx = 0;
+                this.actions.add(this.copy, c);
+                c = new GridBagConstraints();
+                c.anchor = 13;
+                c.gridx = 1;
+                c.fill = 2;
+                c.weightx = 1.0;
+                final JPanel filler = new JPanel();
+                filler.setOpaque(false);
+                this.actions.add(filler, c);
+                this.setIgnoreRepaint(true);
+                this.removeAll();
+                this.add(this.editor.getComponent(), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, 11, 2, (Insets) new JBInsets(0, 0, 0, 0), 0, 0));
+                this.add(this.actions, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, 11, 2, (Insets) new JBInsets(0, 0, 0, 0), 0, 0));
+                this.setIgnoreRepaint(false);
+                this.revalidate();
+                this.repaint();
             });
-            this.editor = (EditorImpl)EditorFactory.getInstance().createEditor(this.document, this.project, (VirtualFile)this.file, false, EditorKind.MAIN_EDITOR);
-            this.editor.getComponent().setAutoscrolls(false);
-            this.editor.setVerticalScrollbarVisible(false);
-            this.editor.getScrollPane().getHorizontalScrollBar().setEnabled(false);
-            final JViewport viewport = this.editor.getScrollPane().getViewport();
-            final Point currentPosition = viewport.getViewPosition();
-            this.editor.getScrollPane().getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-                @Override
-                public void adjustmentValueChanged(final AdjustmentEvent e) {
-                    viewport.setViewPosition(currentPosition);
-                }
-            });
-            (this.actions = new JPanel(new GridBagLayout())).setOpaque(false);
-            this.setOpaque(false);
-            (this.copy = new ActionButton("Copy", "Copied!", new ActionButton.ClickedListener() {
-                @Override
-                public void clicked(final MouseEvent e) {
-                    final CopyPasteManager copyPasteManager = CopyPasteManager.getInstance();
-                    final Transferable transferable = new StringSelection(View.this.document.getText());
-                    copyPasteManager.setContents(transferable);
-                }
-            })).setOpaque(false);
-            GridBagConstraints c = new GridBagConstraints();
-            c.anchor = 17;
-            c.gridx = 0;
-            this.actions.add(this.copy, c);
-            c = new GridBagConstraints();
-            c.anchor = 13;
-            c.gridx = 1;
-            c.fill = 2;
-            c.weightx = 1.0;
-            final JPanel filler = new JPanel();
-            filler.setOpaque(false);
-            this.actions.add(filler, c);
-            this.setIgnoreRepaint(true);
-            this.removeAll();
-            this.add(this.editor.getComponent(), new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, 11, 2, (Insets)new JBInsets(0, 0, 0, 0), 0, 0));
-            this.add(this.actions, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, 11, 2, (Insets)new JBInsets(0, 0, 0, 0), 0, 0));
-            this.setIgnoreRepaint(false);
-            this.revalidate();
-            this.repaint();
         }
-        
+
         @Override
         public void setContent(@NotNull final String content) {
             if (content == null) {
                 $$$reportNull$$$0(2);
             }
-            final String cleanContent = ContextUtils.stripLineNumbers( content.strip());
+            final String cleanContent = ContextUtils.stripLineNumbers(content.strip());
             ApplicationManager.getApplication().invokeLater(() -> WriteCommandAction.runWriteCommandAction(this.project, () -> {
-                this.document.setText((CharSequence)cleanContent);
+                this.document.setText((CharSequence) cleanContent);
                 this.resizeToContent();
                 this.editor.getComponent().revalidate();
                 this.editor.getComponent().repaint();
             }));
         }
-        
+
         public void resizeToContent() {
-            int lineCount = this.document.getLineCount() - 2;
+            int lineCount = this.document.getLineCount();
             if (lineCount < 1) {
                 lineCount = 1;
             }
@@ -371,22 +363,22 @@ public class CodeViewer extends MessagePart implements Disposable
             this.editor.getComponent().setMinimumSize(new Dimension(400, height));
             this.editor.getComponent().setPreferredSize(new Dimension(400, height));
         }
-        
+
         public void dispose() {
             if (this.editor == null) {
                 return;
             }
-            EditorFactory.getInstance().releaseEditor((Editor)this.editor);
+            EditorFactory.getInstance().releaseEditor((Editor) this.editor);
         }
-        
+
         public Document getDocument() {
             return this.document;
         }
-        
+
         public LightVirtualFile getFile() {
             return this.file;
         }
-        
+
         private static /* synthetic */ void $$$reportNull$$$0(final int n) {
             final String format = "Argument for @NotNull parameter '%s' of %s.%s must not be null";
             final Object[] args = new Object[3];
