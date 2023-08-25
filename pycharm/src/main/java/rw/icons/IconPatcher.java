@@ -9,8 +9,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.IconManager;
 import com.intellij.ui.LayeredIcon;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.handler.runConf.RunConfHandlerManager;
+import rw.handler.RunConfHandler;
+import rw.handler.RunConfHandlerManager;
 import rw.preferences.Preferences;
 import rw.preferences.PreferencesState;
 
@@ -21,12 +21,12 @@ import java.util.List;
 public class IconPatcher implements FileIconPatcher, DumbAware {
     static public Icon getIcon(Project project, VirtualFile file, Icon baseIcon) {
         PreferencesState preferences = Preferences.getInstance().getState();
-        if(!preferences.markReloadable) {
+        if (!preferences.markReloadable) {
             return baseIcon;
         }
 
-        List<BaseRunConfHandler> handlers = RunConfHandlerManager.get().getAllActiveHandlers(project);
-        for (BaseRunConfHandler h : handlers) {
+        List<RunConfHandler> handlers = RunConfHandlerManager.get().getAllActiveHandlers(project);
+        for (RunConfHandler h : handlers) {
             if (!h.isWatched(new File(file.getPath()))) {
                 continue;
             }
@@ -34,9 +34,8 @@ public class IconPatcher implements FileIconPatcher, DumbAware {
             Icon reloadableIcon;
 
             if (file.isDirectory()) {
-                 reloadableIcon = Icons.ReloadableDir;
-            }
-            else {
+                reloadableIcon = Icons.ReloadableDir;
+            } else {
                 reloadableIcon = Icons.ReloadableFile;
             }
 
@@ -54,7 +53,6 @@ public class IconPatcher implements FileIconPatcher, DumbAware {
         }
 
         FileEditorManagerEx.getInstanceEx(project).refreshIcons();
-
     }
 
     public Icon patchIcon(final Icon baseIcon, final VirtualFile file, final int flags, final Project project) {

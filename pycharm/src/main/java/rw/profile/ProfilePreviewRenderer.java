@@ -1,35 +1,27 @@
 package rw.profile;
 
 import com.intellij.diff.util.DiffUtil;
-import com.intellij.execution.process.mediator.daemon.DaemonLaunchOptions;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diff.LineStatusMarkerDrawUtil;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.FoldRegion;
-import com.intellij.openapi.editor.FoldingModel;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.impl.DocumentMarkupModel;
 import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vcs.VcsBundle;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
-import com.intellij.ui.JBColor;
 import com.intellij.xdebugger.ui.DebuggerColors;
 import org.jetbrains.annotations.NotNull;
 import rw.quickconfig.CumulateType;
-import rw.quickconfig.QuickConfig;
-import rw.stack.Stack;
-import rw.highlights.Highlighter;
 
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,9 +29,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.IntStream;
 
 
@@ -59,7 +50,7 @@ class GutterRenderer implements ActiveGutterRenderer {
     @Override
     public void paint(@NotNull Editor editor, @NotNull Graphics g, @NotNull Rectangle r) {
         CumulateType cumulateType = this.lineProfiler.getQuickConfig().getState().getComulateType();
-        Set<Integer> lines = this.fileValues.getValues(cumulateType).keySet();
+        Set<Integer> lines = new HashSet<>(this.fileValues.getValues(cumulateType).keySet());
 
         if (lines.isEmpty()) {
             return;
@@ -138,23 +129,20 @@ class GutterRenderer implements ActiveGutterRenderer {
 
 
 class FileValuesRenderer {
-    File file;
     FileValues fileValues;
     RangeHighlighter device;
     MarkupModel markupModel;
-    VirtualFile virtualFile;
+    VirtualFile file;
     Document document;
     Project project;
     LineProfiler lineProfiler;
 
-    FileValuesRenderer(Project project, File file, FileValues fileValues, LineProfiler lineProfiler) {
-        this.file = file;
+    FileValuesRenderer(Project project, @NotNull VirtualFile file, FileValues fileValues, LineProfiler lineProfiler) {
         this.fileValues = fileValues;
+        this.file = file;
         this.project = project;
         this.lineProfiler = lineProfiler;
-
-        this.virtualFile = new VirtualFileWrapper(this.file).getVirtualFile();
-        this.document = ReadAction.compute(() -> FileDocumentManager.getInstance().getDocument(this.virtualFile));
+        this.document = ReadAction.compute(() -> FileDocumentManager.getInstance().getDocument(this.file));
         this.markupModel = DocumentMarkupModel.forDocument(this.document, this.project, true);
     }
 
@@ -164,18 +152,28 @@ class FileValuesRenderer {
                 return;
             }
             this.markupModel.removeHighlighter(this.device);
-
             this.device = null;
         });
     }
 
     public void activate() {
         this.deactivate();
+
+        if (this.fileValues.isEmpty()) {
+            return;
+        }
+
         Integer minLine = Collections.min(this.fileValues.getValues(CumulateType.DEFAULT).keySet());
         Integer maxLine = Collections.max(this.fileValues.getValues(CumulateType.DEFAULT).keySet());
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            TextRange range = DiffUtil.getLinesRange(this.document, minLine - 1, maxLine);
+            TextRange range;
+            try {
+                range = DiffUtil.getLinesRange(this.document, minLine - 1, maxLine);
+            } catch (IndexOutOfBoundsException e) {
+                return;
+            }
+
             this.device = this.markupModel.addRangeHighlighter(null,
                     range.getStartOffset(), range.getEndOffset(),
                     DebuggerColors.EXECUTION_LINE_HIGHLIGHTERLAYER + 51,
@@ -207,7 +205,7 @@ public class ProfilePreviewRenderer {
 
         this.fileValuesRenderers.clear();
 
-        for (Map.Entry<File, FileValues> pathToFileTiming : this.lineProfiler.getFileTimings().entrySet()) {
+        for (Map.Entry<VirtualFile, FileValues> pathToFileTiming : this.lineProfiler.getFileTimings().entrySet()) {
             FileValuesRenderer fileValuesRenderer = new FileValuesRenderer(this.project,
                     pathToFileTiming.getKey(),
                     pathToFileTiming.getValue(),

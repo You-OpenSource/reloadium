@@ -6,22 +6,23 @@ import com.jetbrains.python.debugger.PyDebugProcess;
 import com.jetbrains.python.debugger.PyDebugRunner;
 import com.jetbrains.python.run.PythonCommandLineState;
 import org.jetbrains.annotations.NotNull;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.session.Session;
+import rw.handler.RunConfHandler;
 
 import java.net.ServerSocket;
 
 public class DebugRunner extends PyDebugRunner {
-    private BaseRunConfHandler handler;
-    public DebugRunner(BaseRunConfHandler handler) {
+    private RunConfHandler handler;
+
+    public DebugRunner(RunConfHandler handler) {
         this.handler = handler;
     }
-      @NotNull
-  protected PyDebugProcess createDebugProcess(@NotNull XDebugSession debugSession,
-                                              ServerSocket serverSocket,
-                                              ExecutionResult result,
-                                              PythonCommandLineState pyState) {
-    return new DebugProcess(debugSession, this.handler, serverSocket, result.getExecutionConsole(), result.getProcessHandler(),
-                              pyState.isMultiprocessDebug());
-  }
+
+    @NotNull
+    protected PyDebugProcess createDebugProcess(@NotNull XDebugSession debugSession,
+                                                ServerSocket serverSocket,
+                                                ExecutionResult result,
+                                                PythonCommandLineState pyState) {
+        return new DebugProcess(debugSession, this.handler, serverSocket, result.getExecutionConsole(), result.getProcessHandler(),
+                pyState.isMultiprocessDebug());
+    }
 }

@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin xmlns:xi="http://www.w3.org/1999/XSL/Transform">
     <id>com.you</id>
     <name>You.com Python Edit and Continue</name>
     <version>0.9.6</version>
@@ -9,17 +9,26 @@
     <depends>com.intellij.modules.platform</depends>
 
     <description><![CDATA[
+        <h3>ChatGPT integration</h3>
+        <div>
+            <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/chatgpt_fix.gif" width="600px" alt="ChatGPT"/>
+        </div>
+
+        <h3>Hot reloading:</h3>
         <div>
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/example_small.gif" width="600px" alt="Hot Reloading"/>
         </div>
+
+        <h3>Profiling</h3>
         <div>
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/profiling.gif" width="600px" alt="Profiling"/>
         </div>
-        
+
+
          <p>You.com Python Edit and Continue. <p>
          This plugin is a fork of Reloadium with You.com Copilot to automatically
           fix the Python runtime errors that Reloadium found.<br>
-         Reloadium adds hot reloading and profiling features to any Python application</p>
+         Reloadium adds hot reloading, profiling and ChatGPT chat to your IDE</p>
          You.com plugin runs the Salesforce <a href="https://github.com/salesforce/CodeGen">16GB Codegen</a>
           model to automatically
           fix any errors in debugging. To test out functionality:<br>
@@ -861,38 +870,65 @@
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="rw.audit.ErrorSubmitter"/>
 
+        <fileEditorProvider implementation="rw.ai.chat.ChatProvider"/>
+
         <projectConfigurable
-          parentId="tools"
-          instance="rw.settings.ProjectSettingsConfigurable"
-          id="rw.settings.ProjectSettings"
-          displayName="Reloadium Project Settings"
-          nonDefaultProject="false"/>
+                parentId="tools"
+                instance="rw.settings.ProjectSettingsConfigurable"
+                id="rw.settings.ProjectSettings"
+                displayName="Reloadium Project Settings"
+                nonDefaultProject="false"/>
 
         <projectService
-          serviceImplementation="rw.settings.ProjectSettings"/>
+                serviceImplementation="rw.settings.ProjectSettings"/>
 
         <applicationConfigurable
-          parentId="tools"
-          instance="rw.preferences.PreferencesConfigurable"
-          id="rw.preferences.Preferences"
-          displayName="Reloadium Preferences"/>
+                parentId="tools"
+                instance="rw.preferences.PreferencesConfigurable"
+                id="rw.preferences.Preferences"
+                displayName="Reloadium Preferences"/>
 
-         <applicationService
-          serviceImplementation="rw.preferences.Preferences"/>
-
-         <applicationService
-          serviceImplementation="rw.dialogs.DialogsState"
-          />
+        <applicationConfigurable
+                parentId="tools"
+                instance="rw.ai.preferences.AiPreferencesConfigurable"
+                id="rw.ai.preferences.AiPreferences"
+                displayName="Reloadium Preferences"/>
 
         <applicationService
-          serviceInterface="rw.service.Service"
-          serviceImplementation="rw.service.Service"
-          testServiceImplementation="rw.service.TestService"
-          />
+                serviceImplementation="rw.preferences.Preferences"/>
+        <applicationService
+                serviceImplementation="rw.ai.preferences.AiPreferences"/>
+
+        <applicationService
+                serviceImplementation="rw.dialogs.DialogsState"
+        />
+
+        <applicationService
+                serviceInterface="rw.service.Service"
+                serviceImplementation="rw.service.Service"
+        />
+
+
+        <postStartupActivity implementation="rw.service.Startup"/>
+        <postStartupActivity implementation="rw.ai.Startup"/>
 
         <fileDocumentManagerListener implementation="rw.action.ReloadOnSave"/>
         <fileIconPatcher implementation="rw.icons.IconPatcher" order="last"/>
         <projectViewNodeDecorator implementation="rw.icons.IconDecorator"/>
+
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.LocalCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.GlobalCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.ImportCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.FrameCompletionContributor"/>
+        <completion.contributor language="Python"
+                                implementationClass="rw.completion.FromImportCompletionContributor"/>
+        <codeInsight.lineMarkerProvider language="Python"
+                                        implementationClass="rw.completion.CompletableFunctionsLineMarker"/>
+        <notificationGroup id="reloadium" displayType="BALLOON"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -918,6 +954,29 @@
     </extensions>
 
     <actions>
+        <action id="FastDebugWithReloadium"
+                class="rw.action.FastDebugWithReloadium"
+                text="Fast Debug with Reloadium"
+                description="Fast Debug script with hot reloading enabled"
+                icon="rw.icons.Icons.FastDebug"
+        >
+            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>
+            <add-to-group group-id="RunMenu" anchor="first"/>
+            <add-to-group group-id="RunDashboardContentToolbar" anchor="first"/>
+        </action>
+        <action id="NewChatAction"
+                class="rw.ai.actions.NewChatAction"
+                text="New AI Chat"
+                description="Fast Debug script with hot reloading enabled"
+                icon="rw.icons.Icons.FastDebug"
+        >
+            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>
+            <add-to-group group-id="RunMenu" anchor="first"/>
+            <add-to-group group-id="RunDashboardContentToolbar" anchor="first"/>
+        </action>
+
         <action id="DebugWithReloadium"
                 class="rw.action.DebugWithReloadium"
                 text="Debug with Reloadium"
@@ -925,6 +984,7 @@
                 icon="rw.icons.Icons.Debug"
         >
             <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>
             <add-to-group group-id="RunMenu" anchor="first"/>
             <add-to-group group-id="RunDashboardContentToolbar" anchor="first"/>
         </action>
@@ -935,11 +995,20 @@
                 description="Run script with hot reloading enabled"
                 icon="rw.icons.Icons.Run">
             <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>
             <add-to-group group-id="RunMenu" anchor="first"/>
             <add-to-group group-id="RunDashboardContentToolbar" anchor="first"/>
         </action>
 
-        <action id="DebugWithReloadiumRunContextPopup"
+        <action id="FastDebugWithReloadiumRunContextPopup"
+                class="rw.action.FastDebugWithReloadiumRunContext"
+                text="Fast Debug with Reloadium"
+                description="Fast Debug script with hot reloading enabled"
+                icon="rw.icons.Icons.FastDebug">
+            <add-to-group group-id="RunContextGroup" anchor="first"/>
+        </action>
+
+        <action id="DebugWithReloadiumRunContext"
                 class="rw.action.DebugWithReloadiumRunContext"
                 text="Debug with Reloadium"
                 description="Debug script with hot reloading enabled"
@@ -947,7 +1016,7 @@
             <add-to-group group-id="RunContextGroup" anchor="first"/>
         </action>
 
-        <action id="RunWithReloadiumRunContextPopup"
+        <action id="RunWithReloadiumRunContext"
                 class="rw.action.RunWithReloadiumRunContext"
                 text="Run with Reloadium"
                 description="Run script with hot reloading enabled"
@@ -957,8 +1026,8 @@
 
         <action id="ManualReload"
                 class="rw.action.ManualReload"
-                text="Reload File"
-                description="Reload File"
+                text="Hot Reload File"
+                description="Hot Reload File"
                 icon="rw.icons.Icons.Update">
             <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
             <add-to-group group-id="RunContextGroup" anchor="last"/>
@@ -988,7 +1057,7 @@
         </group>
 
         <action id="Profile" class="rw.profile.ProfileResultToggle" icon="rw.icons.Icons.Timing">
-          <add-to-group group-id="EditorGutterVcsPopupMenu" relative-to-action="Annotate" anchor="after"/>
+            <add-to-group group-id="EditorGutterVcsPopupMenu" relative-to-action="Annotate" anchor="after"/>
         </action>
 
         <action id="DropFrame"
@@ -1001,5 +1070,7 @@
         </action>
     </actions>
 
+    <xi:include href="ai.xml"/>
+    <xi:include href="depot.xml"/>
 </idea-plugin>
 

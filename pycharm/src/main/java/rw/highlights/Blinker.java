@@ -9,11 +9,9 @@ import java.util.List;
 
 
 public class Blinker {
-    List<Blink> all;
-
     @VisibleForTesting
     public static Blinker singleton;
-
+    List<Blink> all;
     Thread cleaner;
 
 
@@ -38,7 +36,7 @@ public class Blinker {
             return;
         }
 
-        for (Blink b: this.all) {
+        for (Blink b : this.all) {
             if (b.equals(blink)) {
                 b.resetExpiration();
                 return;
@@ -50,12 +48,10 @@ public class Blinker {
     }
 
     private void cleanerTarget() {
-        PreferencesState state = Preferences.getInstance().getState();
-
         while (true) {
             try {
-                Thread.sleep((long) (200));
-            } catch (InterruptedException e) {
+                Thread.sleep(200);
+            } catch (InterruptedException ignored) {
             }
             for (Blink b : new ArrayList<>(this.all)) {
                 if (b.isExpired()) {

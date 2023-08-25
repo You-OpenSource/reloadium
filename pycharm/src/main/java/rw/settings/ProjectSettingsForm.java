@@ -1,14 +1,6 @@
 package rw.settings;
 
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
-import com.intellij.openapi.projectRoots.ui.PathEditor;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileWrapper;
-
 import javax.swing.*;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProjectSettingsForm {
     private JCheckBox addCurrentWorkingDirectoryCB;
@@ -17,9 +9,10 @@ public class ProjectSettingsForm {
     private JCheckBox printLogoCB;
     private JCheckBox cacheEnabledCB;
     private JCheckBox verboseCB;
-    private JCheckBox debuggerSpeedupsCB;
     private JCheckBox watchSourceRootsCB;
     private JComponent reloadiumIgnorePanel;
+    private JCheckBox watchFilesWithBreakpointsCB;
+    private JCheckBox watchOpenFilesCB;
     private RwPathEditor reloadiumPath;
     private RwPathEditor reloadiumIgnore;
 
@@ -42,10 +35,11 @@ public class ProjectSettingsForm {
         state.reloadiumIgnore = this.reloadiumIgnore.getPaths();
         state.watchCwd = this.addCurrentWorkingDirectoryCB.isSelected();
         state.watchSourceRoots = this.watchSourceRootsCB.isSelected();
+        state.watchFilesWithBreakpoints = this.watchFilesWithBreakpointsCB.isSelected();
+        state.watchOpenFiles = this.watchOpenFilesCB.isSelected();
         state.printLogo = this.printLogoCB.isSelected();
         state.cache = this.cacheEnabledCB.isSelected();
         state.verbose = this.verboseCB.isSelected();
-        state.debuggerSpeedups = this.debuggerSpeedupsCB.isSelected();
         return state;
     }
 
@@ -55,9 +49,10 @@ public class ProjectSettingsForm {
 
         this.addCurrentWorkingDirectoryCB.setSelected(state.watchCwd);
         this.watchSourceRootsCB.setSelected(state.watchSourceRoots);
+        this.watchFilesWithBreakpointsCB.setSelected(state.watchFilesWithBreakpoints);
+        this.watchOpenFilesCB.setSelected(state.watchOpenFiles);
         this.printLogoCB.setSelected(state.printLogo);
         this.cacheEnabledCB.setSelected(state.cache);
         this.verboseCB.setSelected(state.verbose);
-        this.debuggerSpeedupsCB.setSelected(state.debuggerSpeedups);
     }
 }

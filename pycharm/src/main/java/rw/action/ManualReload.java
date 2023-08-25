@@ -1,6 +1,9 @@
 package rw.action;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -11,8 +14,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.python.psi.impl.PyFileImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.handler.runConf.RunConfHandlerManager;
+import rw.handler.RunConfHandler;
+import rw.handler.RunConfHandlerManager;
 import rw.session.cmds.ReloadFile;
 
 import java.util.List;
@@ -21,20 +24,9 @@ import java.util.List;
 public class ManualReload extends AnAction implements DumbAware {
     private static final Logger LOGGER = Logger.getInstance(ContextPopupAction.class);
 
-    public void update(@NotNull AnActionEvent e) {
-        List<BaseRunConfHandler> handlers = RunConfHandlerManager.get().getAllActiveHandlers(e.getProject());
-        @Nullable Object data = e.getDataContext().getData("psi.File");
-
-        boolean isEnabled = !handlers.isEmpty() && data != null;
-
-        Presentation presentation = e.getPresentation();
-        presentation.setVisible(true);
-        presentation.setEnabled(isEnabled);
-    }
-
     public static void handleSave(@Nullable Project project, @NotNull Document[] documents) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            List<BaseRunConfHandler> handlers = RunConfHandlerManager.get().getAllActiveHandlers(project);
+            List<RunConfHandler> handlers = RunConfHandlerManager.get().getAllActiveHandlers(project);
             if (handlers.isEmpty()) {
                 return;
             }
@@ -45,12 +37,32 @@ public class ManualReload extends AnAction implements DumbAware {
 
                 VirtualFile file = FileDocumentManager.getInstance().getFile(d);
 
+                if(file == null) {
+                    continue;
+                }
+
                 handlers.forEach(h -> {
-                    ReloadFile cmd = new ReloadFile(h.convertPathToRemote(file.getPath(), true));
+                    ReloadFile cmd = new ReloadFile(h.convertPathToRemote(file.getPath(), true), d.getText());
                     h.getSession().send(cmd);
                 });
             }
         });
+    }
+
+    public void update(@NotNull AnActionEvent e) {
+        List<RunConfHandler> handlers = RunConfHandlerManager.get().getAllActiveHandlers(e.getProject());
+        @Nullable Object data = e.getDataContext().getData("psi.File");
+
+        boolean isEnabled = !handlers.isEmpty() && data != null;
+
+        Presentation presentation = e.getPresentation();
+        presentation.setVisible(true);
+        presentation.setEnabled(isEnabled);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override
@@ -58,8 +70,7 @@ public class ManualReload extends AnAction implements DumbAware {
         PyFileImpl data;
         try {
             data = (PyFileImpl) e.getDataContext().getData("psi.File");
-        }
-        catch (ClassCastException ignored) {
+        } catch (ClassCastException ignored) {
             return;
         }
 

@@ -1,9 +1,7 @@
 package rw.action;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.ExecutionManager;
-import com.intellij.execution.Executor;
-import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.*;
+import com.intellij.execution.actions.RunConfigurationsComboBoxAction;
 import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.impl.ExecutionManagerImpl;
 import com.intellij.execution.impl.RunManagerImpl;
@@ -11,36 +9,40 @@ import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder;
-import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.ide.ui.IdeUiService;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rw.audit.RwSentry;
 import rw.consts.Const;
 import rw.debugger.DebugRunner;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.handler.runConf.RunConfHandlerFactory;
-import rw.handler.runConf.RunConfHandlerManager;
-import rw.handler.sdk.SdkHandler;
-import rw.handler.sdk.SdkHandlerFactory;
-import rw.service.Service;
+import rw.handler.RunConfHandler;
+import rw.handler.RunConfHandlerFactory;
+import rw.handler.RunConfHandlerManager;
+import rw.icons.Icons;
+import rw.util.Vendored;
 
-import java.util.TimerTask;
-import com.jetbrains.python.run.AbstractPythonRunConfiguration;
+import java.lang.reflect.Field;
 
 
 public abstract class WithReloaderBase extends AnAction {
-    RunType runType;
-
     private static final Logger LOGGER = Logger.getInstance(WithReloaderBase.class);
+    RunType runType;
 
     public void update(@NotNull AnActionEvent e) {
         Presentation presentation = e.getPresentation();
@@ -62,121 +64,158 @@ public abstract class WithReloaderBase extends AnAction {
         }
     }
 
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
     public boolean canRun(@NotNull AnActionEvent e) {
-        Service service = Service.get();
         RunnerAndConfigurationSettings conf = this.getConfiguration(e);
 
         if (conf == null) {
             return false;
         }
-
-        if (!AbstractPythonRunConfiguration.class.isAssignableFrom(conf.getConfiguration().getClass())) {
-            return false;
-        }
-        Sdk sdk = ((AbstractPythonRunConfiguration<?>)conf.getConfiguration()).getSdk();
-
-        if (sdk == null) {
-            return false;
-        }
-
-        SdkHandler sdkHandler = SdkHandlerFactory.factory(sdk);
-
-        if (sdkHandler == null) {
-            return false;
-        }
-
-        if (!sdkHandler.isValid()) {
-            return false;
-        }
-
-        return service.canRun(conf);
+        boolean ret = AbstractPythonRunConfiguration.class.isAssignableFrom(conf.getConfiguration().getClass());
+        return ret;
     }
 
-    public void setEnabledText(@NotNull AnActionEvent e, RunnerAndConfigurationSettings conf) {
+    protected String getEnabledText(@NotNull AnActionEvent e, RunnerAndConfigurationSettings conf) {
         String text = String.format("%s '%s' with %s", this.getExecutor().getActionName(),
                 conf.getName(),
                 StringUtil.capitalize(Const.get().packageName));
-        e.getPresentation().setText(text);
+        text = StringUtil.escapeMnemonics(text);
+        return text;
     }
 
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        LOGGER.info("Performing action");
+    public void setEnabledText(@NotNull AnActionEvent e, RunnerAndConfigurationSettings conf) {
+        e.getPresentation().setText(this.getEnabledText(e, conf));
+    }
+
+    public void restartRunProfile(@NotNull Project project, ExecutionEnvironment environment) {
+        ExecutionManager.getInstance(project).restartRunProfile(environment);
+    }
+
+    public void start(@NotNull Project project, RunnerAndConfigurationSettings conf) {
         try {
-            Project project = getEventProject(e);
-
-            if (project == null)
-                return;
-
-            RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
-            RunnerAndConfigurationSettings conf = this.getConfiguration(e);
-
-            ExecutionEnvironment environment = this.getEnvironment(conf);
-
-            RunnerAndConfigurationSettings settings = environment.getRunnerAndConfigurationSettings();
-
-            if (!runManager.hasSettings(settings)) {
-                runManager.addConfiguration(settings);
-            }
-            runManager.setSelectedConfiguration(settings);
+            ExecutionEnvironment environment = this.getEnvironment(project, conf);
 
             if (ExecutionManager.getInstance(project).isStarting(environment))
                 return;
 
-            ExecutionManager.getInstance(project).restartRunProfile(environment);
+            this.restartRunProfile(project, environment);
         } catch (Exception exception) {
-            RwSentry.get().captureException(exception);
+            RwSentry.get().captureException(exception, true);
         }
     }
 
-    protected ExecutionEnvironment getEnvironment(RunnerAndConfigurationSettings conf) throws ExecutionException {
-        BaseRunConfHandler handler = RunConfHandlerFactory.factory(conf.getConfiguration());
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        LOGGER.info("Performing action");
+        Project project = getEventProject(e);
+        if (project == null) {
+            return;
+        }
+        RunnerAndConfigurationSettings runConf = this.getConfiguration(e);
+        assert runConf != null;
+        RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
+
+        if (!runManager.hasSettings(runConf)) {
+            runManager.addConfiguration(runConf);
+        }
+
+        if (runManager.getSelectedConfiguration() != runConf) {
+            runManager.setSelectedConfiguration(runConf);
+        }
+
+        AbstractPythonRunConfiguration<?> pythonRunConf = (AbstractPythonRunConfiguration<?>) runConf.getConfiguration();
+        Sdk sdk = pythonRunConf.getSdk();
+        if (sdk == null) {
+            IdeUiService.getInstance().notifyByBalloon(project, this.getExecutor().getToolWindowId(),
+                    MessageType.ERROR, ExecutionBundle.message("error.running.configuration.message", runConf.getName()) +
+                            "\nSDK is not defined for Run Configuration",
+                    Icons.ProductSmall, null);
+            return;
+        }
+
+        this.start(project, runConf);
+    }
+
+    protected RunConfHandler handlerFactory(RunnerAndConfigurationSettings conf) {
+        RunConfHandler ret = RunConfHandlerFactory.factory(conf.getConfiguration());
+        return ret;
+    }
+
+    public ExecutionEnvironment getEnvironment(@NotNull Project project, @NotNull RunnerAndConfigurationSettings conf) throws ExecutionException {
+        RunConfHandler handler = this.handlerFactory(conf);
         Executor executor = this.getExecutor();
 
-        ExecutionEnvironmentBuilder builder = ExecutionEnvironmentBuilder.create(executor, conf);
+        ExecutionEnvironmentBuilder builder = ExecutionEnvironmentBuilder.create(executor, handler.getRunConf());
 
-        if(executor.getClass().isAssignableFrom(DefaultDebugExecutor.class)) {
+        if (executor.getClass().isAssignableFrom(DefaultDebugExecutor.class)) {
             DebugRunner runner = new DebugRunner(handler);
             builder = builder.runner(runner);
         }
 
-        handler.beforeRun(this.runType);
-
-        TimerTask task = new TimerTask() {
-            public void run() {
-            if (handler.isReloadiumActivated())
-                handler.afterRun();
-            }
-        };
-
-        new java.util.Timer().schedule(task, 5000);
-
-        ExecutionEnvironment ret = builder.build(new ProgramRunner.Callback() {
-            @Override
-            public void processStarted(RunContentDescriptor descriptor) {
-                handler.onProcessStarted(descriptor);
-                handler.afterRun();
-                descriptor.getProcessHandler().addProcessListener(new ProcessAdapter() {
-                    @Override
-                    public void processTerminated(@NotNull ProcessEvent event) {
-                        handler.onProcessExit();
-                    }
-                });
-            }
+        ExecutionEnvironment ret = builder.build(descriptor -> {
+            handler.onProcessStarted(descriptor);
+            descriptor.getProcessHandler().addProcessListener(new ProcessAdapter() {
+                @Override
+                public void processTerminated(@NotNull ProcessEvent event) {
+                    handler.onProcessExit();
+                }
+            });
         });
+
+        Field runnerAndConfigurationSettingsField;
+        try {
+            runnerAndConfigurationSettingsField = ret.getClass().getDeclaredField("myRunnerAndConfigurationSettings");
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+        runnerAndConfigurationSettingsField.setAccessible(true);
+        try {
+            runnerAndConfigurationSettingsField.set(ret, conf);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         handler.setExecutionEnvironment(ret);
         RunConfHandlerManager.get().register(ret, handler);
+
+        handler.beforeRun(this.runType);
+        return ret;
+    }
+
+    @Nullable
+    protected RunnerAndConfigurationSettings getSelectedConfiguration(@NotNull AnActionEvent e) {
+        Project project = getEventProject(e);
+        RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
+        RunnerAndConfigurationSettings ret = runManager.getSelectedConfiguration();
         return ret;
     }
 
     @Nullable
     protected RunnerAndConfigurationSettings getConfiguration(@NotNull AnActionEvent e) {
         Project project = getEventProject(e);
-        RunManagerImpl runManager = RunManagerImpl.getInstanceImpl(project);
-        RunnerAndConfigurationSettings conf = runManager.getSelectedConfiguration();
-        return conf;
-    }
+        RunnerAndConfigurationSettings conf = this.getSelectedConfiguration(e);
 
+        if(conf != null) {
+            return conf;
+        }
+
+        VirtualFile[] files = FileEditorManager.getInstance(project).getSelectedFiles();
+
+        if (files.length == 0) {
+            return null;
+        }
+
+         PsiFile psiFile = PsiManager.getInstance(project).findFile(files[0]);
+
+        if (psiFile == null) {
+            return null;
+        }
+        RunnerAndConfigurationSettings ret = Vendored.getRunConfigForCurrentFile(psiFile);
+        return ret;
+    }
 
     private void handleRunningConfs(Project project, @NotNull AnActionEvent e, RunnerAndConfigurationSettings conf) {
         ExecutionManagerImpl executionManager = ExecutionManagerImpl.getInstance(project);
@@ -199,7 +238,7 @@ public abstract class WithReloaderBase extends AnAction {
         }
     }
 
-    abstract Executor getExecutor();
+    public abstract Executor getExecutor();
 
     abstract void setRunningIcon(AnActionEvent e);
 

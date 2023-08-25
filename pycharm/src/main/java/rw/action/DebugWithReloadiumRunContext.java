@@ -7,8 +7,7 @@ import rw.icons.Icons;
 
 
 public class DebugWithReloadiumRunContext extends ContextPopupAction {
-
-    public static String ID = "DebugWithReloadiumRunContextPopup";
+    public static String ID = "DebugWithReloadiumRunContext";
 
     DebugWithReloadiumRunContext() {
         super();
@@ -19,13 +18,14 @@ public class DebugWithReloadiumRunContext extends ContextPopupAction {
     void setRunningIcon(AnActionEvent e) {
         e.getPresentation().setIcon(Icons.Debug);
     }
+
     @Override
     void setNotRunningIcon(AnActionEvent e) {
         e.getPresentation().setIcon(Icons.Debug);
     }
 
     @Override
-    protected Executor getExecutor() {
+    public Executor getExecutor() {
         return DefaultDebugExecutor.getDebugExecutorInstance();
     }
 }

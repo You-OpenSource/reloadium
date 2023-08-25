@@ -30,7 +30,7 @@ object CodeCompletionService {
                 // Public token
                 "=Zzo;s^[)Rg^\$1*Wo>^UFm"
             ).execute().body();
-            it.onNext(completedCode!!.generatedCode)
+            it.onNext(completedCode!!.generatedCode!!)
             it.onComplete()
         }
     }

@@ -1,20 +1,22 @@
 package rw.session.events;
 
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.VisibleForTesting;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.handler.runConf.BaseRunConfHandler;
+import rw.handler.RunConfHandler;
 
 public class Event {
     public static final String ID = null;
 
-    transient BaseRunConfHandler handler;
+    transient RunConfHandler handler;
 
     @VisibleForTesting
     public void handle() {
-    };
+    }
 
-    public void setHandler(BaseRunConfHandler handler) {
+    public boolean prepare() {
+        return true;
+    }
+
+    public void setHandler(RunConfHandler handler) {
         this.handler = handler;
     }
 }

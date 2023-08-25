@@ -1,18 +1,23 @@
 package rw.pkg.wheel;
 
+import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import rw.consts.Const;
+import rw.pkg.FileSystem;
+import rw.pkg.Machine;
 import rw.util.Architecture;
 import rw.util.OsType;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 abstract public class BaseWheel {
+    public static String RESOURCE_WHEELS_PATH_ROOT = "META-INF/wheels/";
     protected String input;
-
     protected OsType osType;
     protected Architecture architecture;
     private String pythonVersion;
@@ -73,19 +78,45 @@ abstract public class BaseWheel {
         return this.version;
     }
 
-    public File getPackageDir() {
-        return Const.get().getPackagePythonVersionDir(this.getPythonVersion());
+    public boolean accepts(Machine machine) {
+        return this.osType == machine.getOsType() && machine.getArchitecture() == this.architecture;
     }
 
-    public void initPackageDir() {
-        File packageDir = this.getPackageDir();
+    public String getDstDirName() {
+        return this.pythonVersion;
+    }
 
-        if (packageDir.exists()) {
+    public void unpack(FileSystem fs) throws IOException {
+        String tmpdir = Files.createTempDirectory(Const.get().packageName).toFile().getAbsolutePath();
+
+        File tmpWheelFile = new File(tmpdir, this.getFilename());
+
+        InputStream wheelFileStream = getClass().getClassLoader().getResourceAsStream(
+                RESOURCE_WHEELS_PATH_ROOT + this.getFilename()
+        );
+
+        assert wheelFileStream != null;
+
+        FileUtils.copyInputStreamToFile(wheelFileStream, tmpWheelFile);
+        wheelFileStream.close();
+
+        File packageVersionDir = new File(fs.getPackagesRootDir().toString(), this.getDstDirName());
+
+        if (packageVersionDir.exists()) {
             try {
-                FileUtils.deleteDirectory(packageDir);
+                FileUtils.deleteDirectory(packageVersionDir);
             } catch (IOException ignored) {
             }
         }
-        packageDir.mkdirs();
+        packageVersionDir.mkdirs();
+
+        new ZipFile(tmpWheelFile).extractAll(tmpdir);
+
+        fs.putDirectory(new File(tmpdir), packageVersionDir);
+
+        try {
+            tmpWheelFile.delete();
+        } catch (Exception ignored) {
+        }
     }
 }

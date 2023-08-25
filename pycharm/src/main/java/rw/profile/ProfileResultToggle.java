@@ -1,18 +1,13 @@
 package rw.profile;
 
-import com.intellij.execution.ExecutionManager;
-import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.execution.runners.ExecutionEnvironmentProvider;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.project.Project;
-import com.intellij.xdebugger.XDebuggerManager;
-import com.intellij.xdebugger.impl.XDebugSessionImpl;
 import org.jetbrains.annotations.NotNull;
-import rw.handler.runConf.BaseRunConfHandler;
-import rw.service.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,11 +57,10 @@ public final class ProfileResultToggle extends ToggleAction implements DumbAware
         this.editorToGutter.putIfAbsent(editor, new ProfileGutterProvider(editor));
         ProfileGutterProvider gutterProvider = this.editorToGutter.get(editor);
 
-        if (selected){
-          editor.getGutter().registerTextAnnotation(gutterProvider);
-        }
-        else {
-          editor.getGutter().closeTextAnnotations(List.of(gutterProvider));
+        if (selected) {
+            editor.getGutter().registerTextAnnotation(gutterProvider);
+        } else {
+            editor.getGutter().closeTextAnnotations(List.of(gutterProvider));
         }
 
         gutterProvider.setSelected(selected);

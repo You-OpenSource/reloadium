@@ -33,7 +33,7 @@ public class SolutionHighlighter {
 
         this.inlays = new ArrayList<>();
 
-        this.highlighter = new Highlighter(this.project, file, line, getGlobalOrDefaultColor(ERROR_COLOR_KEY), 0, false);
+        this.highlighter = new Highlighter(this.project,  new VirtualFileWrapper(this.file).getVirtualFile(false), line, getGlobalOrDefaultColor(ERROR_COLOR_KEY), 0, false);
     }
 
     public void show() {

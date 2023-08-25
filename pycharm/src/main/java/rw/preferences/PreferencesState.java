@@ -12,21 +12,21 @@ public class PreferencesState {
     public boolean defaultFrameScope;
     public CumulateType defaultCumulateType;
     public ErrorHandlingMode defaultErrorHandlingMode;
+    public boolean alwaysCollectMemory;
 
-    public boolean sentry;
-    public boolean telemetry;
     public boolean markReloadable;
+    public boolean runtimeCompletion;
 
     public PreferencesState() {
         this.blinkDuration = 1000;
-        this.telemetry = true;
-        this.sentry = true;
         this.markReloadable = true;
         this.timingColorMap = ColorMaps.get().viridis.getName();
         this.defaultProfiler = ProfilerType.DEFAULT;
         this.defaultFrameScope = true;
         this.defaultCumulateType = CumulateType.DEFAULT;
         this.defaultErrorHandlingMode = ErrorHandlingMode.DEFAULT;
+        this.alwaysCollectMemory = false;
+        this.runtimeCompletion = true;
     }
 
     @Override
@@ -38,13 +38,13 @@ public class PreferencesState {
         boolean ret;
         ret = this.blinkDuration == that.blinkDuration;
         ret &= this.timingColorMap.equals(that.timingColorMap);
-        ret &= this.sentry == that.sentry;
         ret &= this.markReloadable == that.markReloadable;
-        ret &= this.telemetry == that.telemetry;
         ret &= this.defaultProfiler == that.defaultProfiler;
         ret &= this.defaultFrameScope == that.defaultFrameScope;
         ret &= this.defaultCumulateType == that.defaultCumulateType;
         ret &= this.defaultErrorHandlingMode == that.defaultErrorHandlingMode;
+        ret &= this.alwaysCollectMemory == that.alwaysCollectMemory;
+        ret &= this.runtimeCompletion == that.runtimeCompletion;
         return ret;
     }
 }

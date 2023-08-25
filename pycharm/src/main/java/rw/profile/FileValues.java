@@ -11,7 +11,10 @@ import rw.util.colormap.ColorMap;
 import rw.util.colormap.ColorMaps;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 
@@ -19,18 +22,23 @@ public class FileValues {
     Map<CumulateType, Map<Integer, Long>> values;
     Map<Integer, String> lineToFrame;
 
+
     FileValues() {
         this.values = new HashMap<>();
 
-        for(CumulateType c: CumulateType.getAll()) {
+        for (CumulateType c : CumulateType.getAll()) {
             this.values.put(c, new HashMap<>());
         }
 
         this.lineToFrame = new HashMap<>();
     }
 
-    public void update(Map<Integer, Long> values, String frame, Integer frameLine, CumulateType cumulateType) {
+    synchronized public void update(Map<Integer, Long> values, String frame, Integer frameLine, CumulateType cumulateType) {
         for (Map.Entry<Integer, Long> entry : values.entrySet()) {
+            if (entry.getValue() == 0) {
+                continue;
+            }
+
             Long currentAddValue = this.values.get(CumulateType.ADD).getOrDefault(entry.getKey(), 0L);
             Long currentMeanValue = this.values.get(CumulateType.MEAN).getOrDefault(entry.getKey(), entry.getValue());
             Long currentMaxValue = this.values.get(CumulateType.MAX).getOrDefault(entry.getKey(), 0L);
@@ -56,12 +64,12 @@ public class FileValues {
         }
     }
 
-    Map<Integer, Long> getFoldedValues(Editor editor, @Nullable String frame, CumulateType cumulateType) {
+    synchronized Map<Integer, Long> getFoldedValues(Editor editor, @Nullable String frame, CumulateType cumulateType) {
         final FoldingModel foldingModel = editor.getFoldingModel();
         Document document = editor.getDocument();
 
         Map<Integer, Long> ret = new HashMap<>();
-        Map<Integer, Long> cumulateValues = this.values.get(cumulateType);
+        Map<Integer, Long> cumulateValues = new HashMap<>(this.values.get(cumulateType));
 
         for (Map.Entry<Integer, Long> entry : cumulateValues.entrySet()) {
             int line = entry.getKey() - 1;
@@ -109,7 +117,7 @@ public class FileValues {
     }
 
     @Nullable
-    public Color getLineColor(int line, Editor editor, boolean frameScope, CumulateType cumulateType) {
+    synchronized public Color getLineColor(int line, Editor editor, boolean frameScope, CumulateType cumulateType) {
         String frame;
 
         if (frameScope) {
@@ -144,25 +152,29 @@ public class FileValues {
     }
 
     @Nullable
-    public Long getValue(int line, Editor editor, CumulateType cumulateType) {
+    synchronized public Long getValue(int line, Editor editor, CumulateType cumulateType) {
         return this.getFoldedValues(editor, null, cumulateType).get(line);
     }
 
-    public void clear() {
-        for(CumulateType c: CumulateType.getAll()) {
+    synchronized public void clear() {
+        for (CumulateType c : CumulateType.getAll()) {
             this.values.get(c).clear();
         }
     }
 
-    public Map<Integer, Long> getValues(CumulateType cumulateType) {
+    synchronized public Map<Integer, Long> getValues(CumulateType cumulateType) {
         return this.values.get(cumulateType);
     }
 
-    public void clear(int start, int end) {
+    synchronized public void clear(int start, int end) {
         for (int l : IntStream.rangeClosed(start, end).toArray()) {
             for (CumulateType c : CumulateType.getAll()) {
                 this.values.get(c).remove(l);
             }
         }
+    }
+
+    synchronized public boolean isEmpty() {
+        return this.values.get(CumulateType.DEFAULT).isEmpty();
     }
 }

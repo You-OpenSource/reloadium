@@ -3,14 +3,13 @@ package rw.session.events;
 import com.intellij.openapi.diagnostic.Logger;
 
 public class ClearThreadError extends ThreadEvent {
-    private static final Logger LOGGER = Logger.getInstance(ClearThreadError.class);
-
     public static final String ID = "ClearThreadError";
+    private static final Logger LOGGER = Logger.getInstance(ClearThreadError.class);
 
     @Override
     public void handle() {
         LOGGER.info("Handling ClearThreadError ");
         super.handle();
-        this.handler.getStack().onClearThreadError(this);
+        this.handler.getThreadErrorManager().onThreadErrorClear(this);
     }
 }

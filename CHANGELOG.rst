@@ -2,6 +2,186 @@ Change Log
 ##########
 
 
+1.2.0
+-------
+
+**PyCharm**:
+    
+  Added:
+    * Files with breakpoints are reloadable
+    * Processing files progress
+    * Uploading reloadium package to remote interpreters improvements
+    * Current File run configuration support
+    * Only scroll to error if not visible
+    
+  Fixed:
+    * Persisting current line indicators
+    * Not switching thread errors
+    * Not updating debugger after frame reload
+    * Function local completion not working in remote development
+    * Syntax errors not clearing
+    
+**Miscellaneous**:
+    
+  Added:
+    * Ignore special functions like __getattr__, __repr__ from handling exceptions (Unless with a breakpoint)
+    * Exception handling speed improvements
+    * Drop frame improvements
+    * Function mementos when stepping into
+    * Debug logging when RW_DEBUG=True
+    * Frame reloading closures
+    * Handling errors in closures
+    * Profile child frames when stepping
+    * Better asyncio support
+    
+  Fixed:
+    * Breakpoint always hit on functions last lines
+    * Not handling errors during stepping when wrapped in try from outside
+    * Jittery stepping into
+    * Not breaking in closures
+    * Closure parent function not restarting
+    * Running with reloadium results in normal run when started too quickly.
+    * Encoding issues
+    * Circular import dependency issues for bigger projects
+    
+  Removed:
+    * Drop frame support for python <= 3.9
+    
+1.1.1
+-------
+
+**AI**:
+    
+  Added:
+    * Add change context button
+    * Resizable code viewer
+    * High contrast mode improvements
+    * Sources to replies in square bracket notation
+    
+  Fixed:
+    * Hyperlinks not working in markdown
+    * Code viewer not persisting extensions
+    * Wrong lines for method context
+    
+**PyCharm**:
+    
+  Added:
+    * Set caret position to error location
+    * Dictionary runtime completion improvements
+    
+  Fixed:
+    * Jitters when typing
+    * Multiple runtime completion markers in the gutter issues
+    * Runtime completion indicator not working for remote interpreters
+    
+**Miscellaneous**:
+    
+  Removed:
+    * 3.7 support
+    
+  Added:
+    * Reloading non suspended frames (in debug mode)
+    * Pytest speedups
+    
+  Fixed:
+    * Mementos crashing for non async functions in async context
+    * Not profiling when using freezegun
+    * Stripping docstrings in Python 3.11
+    * Infinite recursion issue for big projects
+    
+1.1.0
+-------
+
+**PyCharm**:
+    
+  Added:
+    * ChatGPT integration
+    * UI Improvements
+    
+  Fixed:
+    * Fix ComparableVersion issues
+    
+1.0.1
+-------
+
+**Miscellaneous**:
+    
+  Added:
+    * Python 3.11 support
+    
+**PyCharm**:
+    
+  Fixed:
+    * Remote interpreters saving issues
+    * Missing () when completing functions
+    * Profiler concurrency issues
+    * Too many whitespaces in completion tail
+    * Apple silicon rosetta support
+    * Completion not working for selected frame in evaluate
+    * Docker compose interpreter not working
+    
+  Added:
+    * Multiline error rendering
+    
+1.0.0
+-------
+
+**Miscellaneous**:
+    
+  Added:
+    * Dropping module frames for M1
+    * Add __doc__ to function calls completion
+    * Runtime completion for evaluate mode
+    * Numpy __doc__ style completion support
+    * FastApi support
+    * Hot reloading docstrings
+    
+  Fixed:
+    * Assertion error in fast debug mode when no breakpoints present
+    * Wrong error lines in fast debug mode
+    * Reloading issues when using snoop library
+    * Celery noreload flag issue
+    * Cannot retrieve frame symbol issues
+    * Cannot drop module frame on M1
+    
+  Removed:
+    * Telemetry, sentry opt out
+    
+**PyCharm**:
+    
+  Fixed:
+    * Completion issues when not suspended
+    * Slow action on EDT issues
+    
+  Added:
+    * Completion in run mode
+    
+0.9.11
+-------
+
+**Miscellaneous**:
+    
+  Fixed:
+    * No reload decorator in function and module frames issues
+    
+  Added:
+    * Fast debug
+    * Async mementos support
+    
+**PyCharm**:
+    
+  Added:
+    * Always collect memory info option
+    * New UI support
+    * Multithreaded frame errors support 
+    * Runtime completion
+    * Remote development automatic package upload
+    * Centering editor on errors
+    
+  Fixed:
+    * Frame progress not showing on first slow line
+    * Null pointer exception when dropping frames
+    
 0.9.10
 -------
 

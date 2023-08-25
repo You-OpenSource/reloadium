@@ -9,7 +9,8 @@ public class QuickConfigStateFactory {
 
         QuickConfigState state = new QuickConfigState(preferences.defaultProfiler,
                 preferences.defaultFrameScope, preferences.defaultCumulateType,
-                preferences.defaultErrorHandlingMode);
-       return state;
+                preferences.defaultErrorHandlingMode,
+                preferences.alwaysCollectMemory);
+        return state;
     }
 }
