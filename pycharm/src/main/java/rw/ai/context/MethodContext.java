@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package rw.ai.context;
 
 import com.jetbrains.python.psi.PyDecorator;

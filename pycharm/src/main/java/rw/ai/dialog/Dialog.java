@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package rw.ai.dialog;
 
 import java.util.ListIterator;
@@ -19,6 +15,8 @@ import ee.carlrobert.openai.client.completion.chat.request.ChatCompletionMessage
 import rw.ai.openai.ClientFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.text.StringUtil;
+import rw.ai.openai.adapter.OpenAiStreamChatCompletionClientWrapper;
+import rw.ai.openai.adapter.StreamChatCompletionClientAdapter;
 import rw.ai.stats.Stats;
 import rw.ai.messages.user.UserMessageModel;
 import rw.ai.context.ContextManager;
@@ -268,7 +266,6 @@ public class Dialog implements Disposable
         if (ApplicationManager.getApplication().isUnitTestMode()) {
             return;
         }
-        final ChatCompletionClient client = ClientFactory.getChatCompletionClient();
         final List<ChatCompletionMessage> messages = List.of(new ChatCompletionMessage("user", prompt));
         ChatCompletionRequest.Builder builder = new ChatCompletionRequest.Builder((List)messages);
         builder = builder.setModel(ChatCompletionModel.GPT_3_5);
@@ -293,7 +290,8 @@ public class Dialog implements Disposable
                 }
             }
         };
-        client.stream((CompletionRequest)request, eventListener);
+        final StreamChatCompletionClientAdapter client = ClientFactory.getChatCompletionClient();
+        client.stream(request, eventListener);
     }
     
     private void onProposedName(@NotNull final String name) {

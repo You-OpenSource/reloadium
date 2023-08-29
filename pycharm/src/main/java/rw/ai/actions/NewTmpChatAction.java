@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package rw.ai.actions;
 
 import com.intellij.openapi.project.Project;

@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package rw.ai.stats;
 
 import com.intellij.util.xmlb.XmlSerializerUtil;

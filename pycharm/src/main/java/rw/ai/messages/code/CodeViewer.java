@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package rw.ai.messages.code;
 
 import com.intellij.openapi.Disposable;
@@ -36,6 +32,7 @@ import rw.ai.dialog.Dialog;
 import rw.ai.messages.MessagePart;
 import rw.ai.messages.MessagePartType;
 import rw.ai.openai.ClientFactory;
+import rw.ai.openai.adapter.StreamChatCompletionClientAdapter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -129,7 +126,6 @@ public class CodeViewer extends MessagePart implements Disposable {
             return;
         }
         CodeViewer.LOGGER.info("Predicting code extension");
-        final ChatCompletionClient client = ClientFactory.getChatCompletionClient();
         final String systemMsg = "You'll be predicting file extensions based on the content syntax.\nYou should return your prediction in just one word.\nExamples would be: \"py\", \"java\", \"kt\", \"json, \"js\".\nThere might be some strings in the code with file extensions. Ignore them. \nIgnore errors, just write predicted extension\n";
         String content = this.model.getContent();
         content = content.replaceAll("\".*?\"", "\"\"");
@@ -163,7 +159,8 @@ public class CodeViewer extends MessagePart implements Disposable {
                 UIUtil.invokeLaterIfNeeded(() -> CodeViewer.this.setExtension(finalPredicted));
             }
         };
-        client.stream((CompletionRequest) request, eventListener);
+        final StreamChatCompletionClientAdapter client = ClientFactory.getChatCompletionClient();
+        client.stream( request, eventListener);
     }
 
     @Override

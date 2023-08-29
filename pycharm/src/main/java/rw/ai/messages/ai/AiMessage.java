@@ -1,7 +1,3 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package rw.ai.messages.ai;
 
 import ee.carlrobert.openai.client.completion.chat.ChatCompletionClient;
@@ -33,6 +29,8 @@ import org.jetbrains.annotations.Nullable;
 import okhttp3.sse.EventSource;
 import org.jetbrains.annotations.NotNull;
 import rw.ai.messages.Message;
+import rw.ai.openai.adapter.OpenAiStreamChatCompletionClientWrapper;
+import rw.ai.openai.adapter.StreamChatCompletionClientAdapter;
 
 public class AiMessage extends Message
 {
@@ -189,12 +187,12 @@ public class AiMessage extends Message
     }
     
     public void makeCall(final List<ChatCompletionMessage> messages, final CompletionEventListener eventListener) {
-        final ChatCompletionClient client = ClientFactory.getChatCompletionClient();
         ChatCompletionRequest.Builder builder = new ChatCompletionRequest.Builder((List)messages);
         builder = (ChatCompletionRequest.Builder)builder.setModel(ChatCompletionModel.GPT_3_5).setTemperature(0.1);
         builder = (ChatCompletionRequest.Builder)builder.setMaxTokens(1000);
         final ChatCompletionRequest request = builder.build();
-        this.call = client.stream((CompletionRequest)request, eventListener);
+        final StreamChatCompletionClientAdapter client = ClientFactory.getChatCompletionClient();
+        this.call = client.stream(request, eventListener);
     }
     
     public void cancel() {

@@ -1,14 +1,8 @@
-// 
-// Decompiled by Procyon v0.5.36
-// 
-
 package rw.ai.preferences;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.Font;
-import javax.swing.BorderFactory;
 import java.awt.Component;
 import java.awt.Dimension;
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -18,13 +12,15 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import java.awt.Insets;
 import ee.carlrobert.openai.client.dashboard.response.Subscription;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import com.intellij.ui.JBColor;
 import ee.carlrobert.openai.client.dashboard.DashboardClient;
 import com.intellij.util.ui.UIUtil;
 import rw.ai.openai.ClientFactory;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JPanel;
 
 public class PreferencesForm
 {
@@ -32,13 +28,21 @@ public class PreferencesForm
     private JPanel account;
     private JPasswordField openAiApiKey;
     private JTextField accountName;
-    
+    private JCheckBox useYouComAI;
+
     public PreferencesForm() {
         this.$$$setupUI$$$();
     }
     
     private void createUIComponents() {
         (this.accountName = new JTextField()).setEditable(false);
+        this.useYouComAI = new JCheckBox("Use You.com AI");
+        this.useYouComAI.addItemListener(e -> {
+            AiPreferencesState state = AiPreferences.get().getState();
+            state.useYoucom = e.getStateChange() == ItemEvent.SELECTED;
+            AiPreferences.get().loadState(state);
+
+        });
     }
     
     public JPanel getMainPanel() {
@@ -46,9 +50,9 @@ public class PreferencesForm
     }
     
     public AiPreferencesState getState() {
-        final DashboardClient billingClient = ClientFactory.getDashboardClient();
         final AiPreferencesState state = new AiPreferencesState();
         final AiPreferencesState state2= new AiPreferencesState();
+        final DashboardClient billingClient = ClientFactory.getDashboardClient();
         billingClient.getSubscriptionAsync(subscription -> UIUtil.invokeLaterIfNeeded(() -> {
             if (subscription.getAccountName() == null) {
                 this.onNotConnected();
@@ -71,6 +75,7 @@ public class PreferencesForm
         else {
             this.accountName.setText(state.accountName);
         }
+        this.useYouComAI.setSelected(state.useYoucom);
     }
     
     public SecretsState getSecretsState() {
@@ -117,5 +122,6 @@ public class PreferencesForm
         accountName.setText("");
         panel.add(accountName, new GridConstraints(1, 1, 1, 1, 8, 1, 6, 0, (Dimension)null, new Dimension(150, -1), (Dimension)null));
         panel.add((Component)new Spacer(), new GridConstraints(1, 2, 1, 1, 0, 1, 6, 1, (Dimension)null, (Dimension)null, (Dimension)null));
+        panel.add(useYouComAI,  new GridConstraints(1, 2, 1, 1, 8, 1, 6, 0, (Dimension)null, new Dimension(150, -1), (Dimension)null));
     }
 }
