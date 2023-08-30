@@ -49,7 +49,7 @@ class NewChatAction extends CreateFromTemplateAction<PsiFile> implements DumbAwa
     
     @Nullable
     protected PsiFile createFile(final String name, final String templateName, final PsiDirectory dir) {
-        final PsiFile file = dir.createFile(  name+ChatFileType.EXTENSION);
+        final PsiFile file = dir.createFile(  name+"."+ChatFileType.EXTENSION);
         ChatFileType.open(this.project, file.getVirtualFile());
         return file;
     }
