@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.fileTypes.FileType;
+import rw.icons.Icons;
 
 public class ChatFileType implements FileType
 {
@@ -69,7 +70,7 @@ public class ChatFileType implements FileType
     }
     
     public Icon getIcon() {
-        return AiIcons.ChatGptSmall;
+        return Icons.CompletableFunction;
     }
     
     public boolean isBinary() {

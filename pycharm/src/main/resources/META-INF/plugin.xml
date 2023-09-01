@@ -1,7 +1,7 @@
 <idea-plugin xmlns:xi="http://www.w3.org/1999/XSL/Transform">
     <id>com.you</id>
     <name>You.com Python Edit and Continue</name>
-    <version>0.9.6</version>
+    <version>1.2.0</version>
     <idea-version since-build="221"/>
     <vendor>You-OpenSource</vendor>
     <depends>com.intellij.modules.lang</depends>
@@ -12,6 +12,14 @@
         <h3>ChatGPT integration</h3>
         <div>
             <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/chatgpt_fix.gif" width="600px" alt="ChatGPT"/>
+        </div>
+        <p>Works with free You.com chat assistant</p>
+        <div>
+            <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/youcom_chat_completion.png" width="600px" alt="ChatGPT with You.com"/>
+        </div>
+        <p>It is possible to ask for fixes for current file</p>
+        <div>
+            <img src="https://raw.githubusercontent.com/reloadware/reloadium/main/media/youcom_chat_context.png" width="600px" alt="ChatGPT with You.com"/>
         </div>
 
         <h3>Hot reloading:</h3>
@@ -969,7 +977,7 @@
                 class="rw.ai.actions.NewChatAction"
                 text="New AI Chat"
                 description="Fast Debug script with hot reloading enabled"
-                icon="rw.icons.Icons.FastDebug"
+                icon="rw.icons.Icons.CompletableFunction"
         >
             <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
             <add-to-group group-id="RunToolbarMainActionGroup" anchor="first"/>

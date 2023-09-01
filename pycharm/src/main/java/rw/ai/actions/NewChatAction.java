@@ -1,5 +1,6 @@
 package rw.ai.actions;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.ide.actions.CreateFileFromTemplateDialog;
 import org.jetbrains.annotations.Nullable;
@@ -15,13 +16,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.psi.PsiFile;
 import com.intellij.ide.actions.CreateFromTemplateAction;
+import rw.icons.Icons;
 
 class NewChatAction extends CreateFromTemplateAction<PsiFile> implements DumbAware
 {
     Project project;
     
     public NewChatAction() {
-        super(AiBundle.message("ai.new.chat.file", new Object[0]), AiBundle.message("ai.new.chat.file.description", new Object[0]), AiIcons.ChatGptSmall);
+        super(AiBundle.message("ai.new.chat.file", new Object[0]), AiBundle.message("ai.new.chat.file.description", new Object[0]), Icons.CompletableFunction);
     }
     
     public void update(@NotNull final AnActionEvent e) {
@@ -55,7 +57,7 @@ class NewChatAction extends CreateFromTemplateAction<PsiFile> implements DumbAwa
     }
     
     protected void buildDialog(final Project project, final PsiDirectory directory, final CreateFileFromTemplateDialog.Builder builder) {
-        builder.setTitle(AiBundle.message("ai.new.chat.file.title", new Object[0])).addKind(AiBundle.message("ai.new.chat.file", new Object[0]), AiIcons.ChatGptSmall, "AiChat");
+        builder.setTitle(AiBundle.message("ai.new.chat.file.title", new Object[0])).addKind(AiBundle.message("ai.new.chat.file", new Object[0]), Icons.CompletableFunction, "AiChat");
     }
     
     private static /* synthetic */ void $$$reportNull$$$0(final int n) {
